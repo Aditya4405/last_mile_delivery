@@ -35,7 +35,7 @@ export const areaService = {
     const areas = getCollection('areas');
 
     if (areas.some((a) => a.zip === areaData.zip)) {
-      throw new Error('An area with this ZIP/Postal Code already exists.');
+      throw new Error('An area with this Pincode already exists.');
     }
 
     const newArea = {
@@ -57,7 +57,7 @@ export const areaService = {
     if (index === -1) throw new Error('Area not found.');
 
     if (areas.some((a) => a.id !== id && a.zip === areaData.zip)) {
-      throw new Error('An area with this ZIP/Postal Code already exists.');
+      throw new Error('An area with this Pincode already exists.');
     }
 
     areas[index] = { ...areas[index], ...areaData };

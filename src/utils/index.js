@@ -8,9 +8,10 @@ export const formatDate = (date, formatStr = 'DD MMM YYYY, hh:mm A') => {
 
 export const formatCurrency = (amount) => {
   if (amount === undefined || amount === null) return '-';
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'INR',
+    maximumFractionDigits: 0,
   }).format(amount);
 };
 

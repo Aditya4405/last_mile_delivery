@@ -17,18 +17,18 @@ const SEED_AREAS = [
 ];
 
 const SEED_RATE_CARDS = [
-  { id: 'rate-1', type: 'B2C', scope: 'Intra Zone', baseWeight: 1, basePrice: 5.0, extraWeightPrice: 2.0, codCharge: 1.5 },
-  { id: 'rate-2', type: 'B2C', scope: 'Inter Zone', baseWeight: 1, basePrice: 8.5, extraWeightPrice: 3.5, codCharge: 2.0 },
-  { id: 'rate-3', type: 'B2B', scope: 'Intra Zone', baseWeight: 5, basePrice: 15.0, extraWeightPrice: 1.5, codCharge: 0.0 },
-  { id: 'rate-4', type: 'B2B', scope: 'Inter Zone', baseWeight: 5, basePrice: 28.0, extraWeightPrice: 2.5, codCharge: 2.0 },
+  { id: 'rate-1', type: 'B2C', scope: 'Intra Zone', baseWeight: 1, basePrice: 80.0, extraWeightPrice: 15.0, codCharge: 25.0 },
+  { id: 'rate-2', type: 'B2C', scope: 'Inter Zone', baseWeight: 1, basePrice: 150.0, extraWeightPrice: 30.0, codCharge: 40.0 },
+  { id: 'rate-3', type: 'B2B', scope: 'Intra Zone', baseWeight: 5, basePrice: 450.0, extraWeightPrice: 10.0, codCharge: 0.0 },
+  { id: 'rate-4', type: 'B2B', scope: 'Inter Zone', baseWeight: 5, basePrice: 850.0, extraWeightPrice: 20.0, codCharge: 50.0 },
 ];
 
 const SEED_AGENTS = [
   {
     id: 'user-agent-1',
     name: 'John Delivery Agent',
-    email: 'agent@swiftroute.com',
-    phone: '+1 (555) 012-3456',
+    email: 'agent@logitrack.com',
+    phone: '+91 98765 43212',
     role: ROLES.AGENT,
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
     status: 'active',
@@ -41,8 +41,8 @@ const SEED_AGENTS = [
   {
     id: 'user-agent-2',
     name: 'Sarah Smith',
-    email: 'sarah.agent@swiftroute.com',
-    phone: '+1 (555) 019-9021',
+    email: 'sarah.agent@logitrack.com',
+    phone: '+91 98765 43213',
     role: ROLES.AGENT,
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
     status: 'active',
@@ -55,8 +55,8 @@ const SEED_AGENTS = [
   {
     id: 'user-agent-3',
     name: 'Mike Tyson',
-    email: 'mike.agent@swiftroute.com',
-    phone: '+1 (555) 018-8822',
+    email: 'mike.agent@logitrack.com',
+    phone: '+91 98765 43214',
     role: ROLES.AGENT,
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
     status: 'inactive',
@@ -72,9 +72,9 @@ const SEED_ORDERS = [
   {
     id: 'ORD-9821',
     trackingNumber: 'TRK-9821-456',
-    pickupAddress: 'Green Park Plaza, Block C, Room 102',
+    pickupAddress: 'Sector 62, Noida, Uttar Pradesh, Pincode 201301',
     pickupZone: 'zone-1',
-    dropAddress: 'Downtown Office Towers, Floor 14',
+    dropAddress: 'Green Park Market, Block C, New Delhi, Pincode 110016',
     dropZone: 'zone-5',
     length: 30,
     breadth: 20,
@@ -84,7 +84,7 @@ const SEED_ORDERS = [
     billableWeight: 2.5,
     orderType: 'B2C',
     paymentType: 'Prepaid',
-    price: 15.5,
+    price: 180.0,
     estimatedDelivery: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(), // tomorrow
     status: ORDER_STATUS.PENDING,
     customerId: 'user-customer-1',
@@ -106,9 +106,9 @@ const SEED_ORDERS = [
   {
     id: 'ORD-9710',
     trackingNumber: 'TRK-9710-112',
-    pickupAddress: 'Cyber City Hub, Tower A',
+    pickupAddress: 'Cyber City Phase 3, Gurgaon, Haryana, Pincode 122002',
     pickupZone: 'zone-2',
-    dropAddress: 'Metro Retail Plaza, Shop 5',
+    dropAddress: 'AIIMS Campus, Ring Road, New Delhi, Pincode 110029',
     dropZone: 'zone-4',
     length: 15,
     breadth: 15,
@@ -118,7 +118,7 @@ const SEED_ORDERS = [
     billableWeight: 0.8,
     orderType: 'B2B',
     paymentType: 'COD',
-    price: 32.0,
+    price: 420.0,
     estimatedDelivery: new Date(Date.now() + 1000 * 60 * 60 * 4).toISOString(), // in 4 hours
     status: ORDER_STATUS.ASSIGNED,
     customerId: 'user-customer-1',
@@ -148,9 +148,9 @@ const SEED_ORDERS = [
   {
     id: 'ORD-9605',
     trackingNumber: 'TRK-9605-779',
-    pickupAddress: 'Downtown Center, Main Warehouse',
+    pickupAddress: 'Connaught Place Outer Circle, New Delhi, Pincode 110001',
     pickupZone: 'zone-5',
-    dropAddress: 'Industrial Complex, Facility B',
+    dropAddress: 'Okhla Industrial Area Phase 3, New Delhi, Pincode 110020',
     dropZone: 'zone-3',
     length: 60,
     breadth: 40,
@@ -160,7 +160,7 @@ const SEED_ORDERS = [
     billableWeight: 14.5,
     orderType: 'B2B',
     paymentType: 'Prepaid',
-    price: 45.0,
+    price: 1250.0,
     estimatedDelivery: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), // 3 hours ago
     status: ORDER_STATUS.DELIVERED,
     customerId: 'user-customer-1',

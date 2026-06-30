@@ -70,10 +70,10 @@ export const rateCardService = {
     );
 
     if (!rateCard) {
-      // Fallback standard calculation if ratecard missing
-      const base = orderType === 'B2B' ? 25.0 : 8.0;
-      const extra = billableWeight > 2 ? (billableWeight - 2) * 2.5 : 0;
-      const cod = paymentType === 'COD' ? 2.0 : 0;
+      // Fallback standard calculation if ratecard missing (INR scale)
+      const base = orderType === 'B2B' ? 350.0 : 70.0;
+      const extra = billableWeight > 2 ? (billableWeight - 2) * 20.0 : 0;
+      const cod = paymentType === 'COD' ? 30.0 : 0;
       return base + extra + cod;
     }
 

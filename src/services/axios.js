@@ -1,7 +1,7 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.swiftroute-logistics.com/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.logitrack-logistics.in/v1';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,

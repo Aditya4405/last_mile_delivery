@@ -22,12 +22,12 @@ export const dashboardService = {
 
     // Monthly charts data
     const monthlyRevenue = [
-      { month: 'Jan', revenue: 1200, orders: 45 },
-      { month: 'Feb', revenue: 1900, orders: 72 },
-      { month: 'Mar', revenue: 3100, orders: 110 },
-      { month: 'Apr', revenue: 2400, orders: 95 },
-      { month: 'May', revenue: 3800, orders: 140 },
-      { month: 'Jun', revenue: revenue + 4200, orders: orders.length + 160 },
+      { month: 'Jan', revenue: 125000, orders: 450 },
+      { month: 'Feb', revenue: 192000, orders: 720 },
+      { month: 'Mar', revenue: 310000, orders: 1100 },
+      { month: 'Apr', revenue: 245000, orders: 950 },
+      { month: 'May', revenue: 380000, orders: 1400 },
+      { month: 'Jun', revenue: revenue + 420000, orders: orders.length + 1600 },
     ];
 
     const zoneDistribution = [
