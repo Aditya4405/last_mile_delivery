@@ -8,33 +8,33 @@ const AuthContext = createContext();
 const MOCK_USERS = [
   {
     id: 'user-admin-1',
-    email: 'admin@swiftroute.com',
+    email: 'admin@logitrack.com',
     password: 'password123',
     name: 'Admin User',
     role: ROLES.ADMIN,
-    phone: '+1 (555) 019-2831',
+    phone: '+91 98765 43210',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
     zoneId: 'zone-5',
   },
   {
     id: 'user-customer-1',
-    email: 'customer@swiftroute.com',
+    email: 'customer@logitrack.com',
     password: 'password123',
     name: 'Customer Aditya',
     role: ROLES.CUSTOMER,
-    phone: '+1 (555) 014-9844',
+    phone: '+91 98765 43211',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-    address: '123 Main St, Apartment 4B',
+    address: 'Block E, Connaught Place, New Delhi',
     zip: '110001',
     company: 'Aditya Retail Corp',
   },
   {
     id: 'user-agent-1',
-    email: 'agent@swiftroute.com',
+    email: 'agent@logitrack.com',
     password: 'password123',
     name: 'John Delivery Agent',
     role: ROLES.AGENT,
-    phone: '+1 (555) 012-3456',
+    phone: '+91 98765 43212',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
     status: 'active', // agent specific status: active / inactive
     workload: 3, // current assigned deliveries
@@ -48,8 +48,44 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize Auth State from localStorage
+  // Initialize Auth State from localStorage and run migration checks
   useEffect(() => {
+    try {
+      const storedUsers = localStorage.getItem('registered_users');
+      if (storedUsers && storedUsers.includes('@swiftroute.com')) {
+        const users = JSON.parse(storedUsers);
+        const migrated = users.map(u => {
+          if (u.email && u.email.endsWith('@swiftroute.com')) {
+            u.email = u.email.replace('@swiftroute.com', '@logitrack.com');
+          }
+          return u;
+        });
+        localStorage.setItem('registered_users', JSON.stringify(migrated));
+      }
+
+      const storedAgents = localStorage.getItem('agents');
+      if (storedAgents && storedAgents.includes('@swiftroute.com')) {
+        const agents = JSON.parse(storedAgents);
+        const migrated = agents.map(a => {
+          if (a.email && a.email.endsWith('@swiftroute.com')) {
+            a.email = a.email.replace('@swiftroute.com', '@logitrack.com');
+          }
+          return a;
+        });
+        localStorage.setItem('agents', JSON.stringify(migrated));
+      }
+
+      const storedUser = localStorage.getItem('user') || sessionStorage.getItem('user');
+      if (storedUser && storedUser.includes('@swiftroute.com')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+      }
+    } catch (e) {
+      console.error('Browser localstorage migration failed', e);
+    }
+
     const initializeAuth = async () => {
       try {
         const storedToken = localStorage.getItem('token') || sessionStorage.getItem('token');

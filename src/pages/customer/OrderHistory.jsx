@@ -67,13 +67,13 @@ const OrderHistory = () => {
       key: 'id',
       label: 'Order ID',
       sortable: true,
-      render: (val) => <span className="font-bold text-brand-650 dark:text-brand-400">{val}</span>,
+      render: (val) => <span className="font-bold text-brand-650">{val}</span>,
     },
     { key: 'trackingNumber', label: 'Tracking No', sortable: true },
     { key: 'dropAddress', label: 'Drop Location', render: (val) => <span className="truncate max-w-[160px] block">{val}</span> },
     { key: 'billableWeight', label: 'Weight (kg)', sortable: true },
-    { key: 'price', label: 'Price', sortable: true, render: (val) => formatCurrency(val) },
-    { key: 'createdAt', label: 'Booked Date', sortable: true, render: (val) => formatDate(val, 'DD MMM YYYY') },
+    { key: 'price', label: 'Charges', sortable: true, render: (val) => formatCurrency(val) },
+    { key: 'createdAt', label: 'Booking Date', sortable: true, render: (val) => formatDate(val, 'DD MMM YYYY') },
     {
       key: 'status',
       label: 'Status',
@@ -89,7 +89,7 @@ const OrderHistory = () => {
             <Button size="sm" variant="outline" icon={FiEye}>Details</Button>
           </Link>
           {row.status !== 'delivered' && row.status !== 'failed' && (
-            <Link to={`/customer/orders/${row.id}/track`} title="Live Telemetry">
+            <Link to={`/customer/orders/${row.id}/track`} title="Track Shipment">
               <Button size="sm" variant="primary" icon={FiTruck}>Track</Button>
             </Link>
           )}
@@ -107,12 +107,12 @@ const OrderHistory = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <FiList className="text-brand-655" />
-            My Order History
+          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <FiList className="text-brand-600" />
+            My Shipment History
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Browse and search all your parcel manifest booking logs.
+          <p className="text-xs text-slate-500 mt-1">
+            Browse and search all your parcel booking logs.
           </p>
         </div>
         <Link to="/customer/book">
@@ -123,7 +123,7 @@ const OrderHistory = () => {
       </div>
 
       {/* Filter and Search Panel */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-205 dark:border-slate-750 shadow-subtle">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-subtle">
         <SearchBar
           value={search}
           onChange={setSearch}

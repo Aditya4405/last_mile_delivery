@@ -46,7 +46,7 @@ const CustomerDashboard = () => {
     {
       key: 'id',
       label: 'Order ID',
-      render: (val) => <span className="font-bold text-brand-650 dark:text-brand-400">{val}</span>,
+      render: (val) => <span className="font-bold text-brand-650">{val}</span>,
     },
     { key: 'dropAddress', label: 'Destination', render: (val) => <span className="truncate max-w-[200px] block">{val}</span> },
     { key: 'price', label: 'Charge', render: (val) => <span>{formatCurrency(val)}</span> },
@@ -78,11 +78,11 @@ const CustomerDashboard = () => {
     <div className="space-y-6">
       {/* Welcome Card & Track Shortcut */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-gradient-to-r from-brand-600 to-indigo-650 dark:from-brand-900 dark:to-indigo-950 p-6 rounded-2xl text-white shadow-premium flex flex-col justify-between">
+        <div className="md:col-span-2 bg-gradient-to-r from-brand-600 to-indigo-650 p-6 rounded-2xl text-white shadow-premium flex flex-col justify-between">
           <div>
             <h1 className="text-xl font-bold">Good day, {user?.name}!</h1>
             <p className="text-xs text-brand-100 mt-1.5 leading-relaxed max-w-md">
-              Welcome to the SwiftRoute Logistics portal. Book B2B/B2C deliveries, calculate volumetric weight, and track status telemetry in real-time.
+              Welcome to the LogiTrack Logistics portal. Book B2B/B2C deliveries, calculate volumetric weight, and track status in real-time.
             </p>
           </div>
           <div className="flex items-center gap-3 mt-6">
@@ -92,7 +92,7 @@ const CustomerDashboard = () => {
               </Button>
             </Link>
             <Link to="/customer/orders">
-              <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 dark:hover:bg-white/5">
+              <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
                 View All Bookings
               </Button>
             </Link>
@@ -100,14 +100,14 @@ const CustomerDashboard = () => {
         </div>
 
         {/* Quick Tracking Widget */}
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card flex flex-col justify-between">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-card flex flex-col justify-between">
           <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <FiSearch className="text-brand-500" />
-              Quick Tracking Telemetry
+              Quick Shipment Tracking
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-              Enter any tracking or manifest ID to access instant telemetry signals.
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              Enter any tracking or order ID to access instant delivery status.
             </p>
           </div>
           <form onSubmit={handleTrackSubmit} className="mt-4 space-y-3">
@@ -116,10 +116,7 @@ const CustomerDashboard = () => {
               placeholder="e.g. TRK-9710-112 or ORD-9710"
               value={trackQuery}
               onChange={(e) => setTrackQuery(e.target.value)}
-              className="
-                block w-full rounded-lg border border-slate-300 dark:border-slate-700 text-xs px-3.5 py-2.5
-                bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 focus:outline-none
-              "
+              className="block w-full rounded-lg border border-slate-300 text-xs px-3.5 py-2.5 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none"
             />
             <Button type="submit" variant="primary" size="sm" className="w-full">
               Locate Package
@@ -140,23 +137,23 @@ const CustomerDashboard = () => {
           title="Pending Shipments"
           value={stats?.cards?.pendingDeliveries || 0}
           icon={FiActivity}
-          iconBg="bg-amber-50 dark:bg-amber-950/20"
-          iconColor="text-amber-600 dark:text-amber-400"
+          iconBg="bg-amber-50 "
+          iconColor="text-amber-600 "
           loading={loading}
         />
         <StatsCard
           title="Delivered Handouts"
           value={stats?.cards?.deliveredOrders || 0}
           icon={FiTruck}
-          iconBg="bg-success-50 dark:bg-success-950/20"
-          iconColor="text-success-600 dark:text-success-400"
+          iconBg="bg-success-50 "
+          iconColor="text-success-600 "
           loading={loading}
         />
         <StatsCard
-          title="Total Spent (USD)"
+          title="Total Delivery Charges"
           value={formatCurrency(stats?.cards?.totalSpent || 0)}
           icon={FiTrendingUp}
-          iconBg="bg-primary-50 dark:bg-primary-950/20"
+          iconBg="bg-primary-50 "
           iconColor="text-primary-600"
           loading={loading}
         />
@@ -165,13 +162,13 @@ const CustomerDashboard = () => {
       {/* Analytics Charts & Delivery Trend */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Trend Area Chart */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4">
+        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-card">
+          <h3 className="text-sm font-bold text-slate-900 mb-4">
             Weekly Delivery Success Metrics
           </h3>
           <div className="h-64">
             {loading ? (
-              <div className="w-full h-full bg-slate-100 dark:bg-slate-700 animate-pulse rounded-lg" />
+              <div className="w-full h-full bg-slate-100 animate-pulse rounded-lg" />
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={stats?.charts?.deliveryTrend}>
@@ -204,19 +201,19 @@ const CustomerDashboard = () => {
         </div>
 
         {/* Quick Help FAQs summary */}
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card flex flex-col justify-between">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-card flex flex-col justify-between">
           <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">
               Help Center FAQs
             </h3>
             <div className="space-y-3">
-              <div className="p-3 bg-slate-50 dark:bg-slate-750 rounded-lg">
-                <p className="text-xs font-bold text-slate-750 dark:text-slate-200">How is Volumetric Weight measured?</p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">It calculates package dimensions: (Length × Breadth × Height) / 5000 in cm.</p>
+              <div className="p-3 bg-slate-50 rounded-lg">
+                <p className="text-xs font-bold text-slate-700">How is Volumetric Weight measured?</p>
+                <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">It calculates package dimensions: (Length × Breadth × Height) / 5000 in cm.</p>
               </div>
-              <div className="p-3 bg-slate-50 dark:bg-slate-750 rounded-lg">
-                <p className="text-xs font-bold text-slate-750 dark:text-slate-200">Can I edit address post booking?</p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Addresses can be modified until an agent picks up the shipment.</p>
+              <div className="p-3 bg-slate-50 rounded-lg">
+                <p className="text-xs font-bold text-slate-700">Can I edit address post booking?</p>
+                <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">Addresses can be modified until an agent picks up the shipment.</p>
               </div>
             </div>
           </div>
@@ -231,10 +228,10 @@ const CustomerDashboard = () => {
       {/* Recent Orders List */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-            Recent Delivery Manifests
+          <h3 className="text-sm font-bold text-slate-900">
+            Recent Shipments
           </h3>
-          <Link to="/customer/orders" className="text-xs font-semibold text-brand-650 hover:underline dark:text-brand-405">
+          <Link to="/customer/orders" className="text-xs font-semibold text-brand-650 hover:underline">
             View All Bookings
           </Link>
         </div>

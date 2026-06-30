@@ -1,14 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiMenu, FiSun, FiMoon, FiBell, FiChevronDown, FiUser, FiSettings, FiLogOut, FiCheck, FiTrash2 } from 'react-icons/fi';
+import { FiMenu, FiBell, FiChevronDown, FiUser, FiSettings, FiLogOut, FiCheck, FiTrash2 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import { useNotifications } from '../context/NotificationContext';
 import { formatDate } from '../utils';
 
 const Navbar = ({ onToggleSidebar }) => {
   const { user, logout } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -32,70 +30,61 @@ const Navbar = ({ onToggleSidebar }) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 transition-colors">
+    <header className="sticky top-0 z-30 h-16 bg-white/80 backdrop-blur border-b border-slate-200 flex items-center justify-between px-6 transition-colors">
       {/* Mobile Hamburger */}
       <div className="flex items-center gap-4">
         <button
           onClick={onToggleSidebar}
-          className="lg:hidden p-1.5 rounded-lg border border-slate-205 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
+          className="lg:hidden p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600"
         >
           <FiMenu className="h-5 w-5" />
         </button>
         
         {/* Dynamic Greeting */}
         <div className="hidden sm:block">
-          <h2 className="text-sm font-bold text-slate-850 dark:text-slate-100">
+          <h2 className="text-sm font-bold text-slate-800">
             Welcome back, {user?.name || 'User'}
           </h2>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400">
+          <p className="text-[10px] text-slate-500">
             Operations Telemetry Terminal
           </p>
         </div>
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Dark Mode Toggle */}
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-550 dark:text-slate-400 shadow-subtle transition-all"
-          title="Toggle Theme"
-        >
-          {isDark ? <FiSun className="h-4.5 w-4.5 text-amber-500" /> : <FiMoon className="h-4.5 w-4.5" />}
-        </button>
-
         {/* Notifications Dropdown */}
         <div className="relative" ref={notificationsRef}>
           <button
             onClick={() => setShowNotificationsMenu((prev) => !prev)}
-            className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-550 dark:text-slate-400 shadow-subtle transition-all relative"
+            className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-550 shadow-subtle transition-all relative"
           >
             <FiBell className="h-4.5 w-4.5" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center ring-2 ring-white dark:ring-slate-900">
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center ring-2 ring-white">
                 {unreadCount}
               </span>
             )}
           </button>
 
           {showNotificationsMenu && (
-            <div className="absolute right-0 mt-2 w-80 rounded-xl border border-slate-200 dark:border-slate-750 bg-white dark:bg-slate-800 shadow-hover z-40 overflow-hidden">
-              <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-750 flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
+            <div className="absolute right-0 mt-2 w-80 rounded-xl border border-slate-200 bg-white shadow-hover z-40 overflow-hidden">
+              <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-900">
                   Notifications
                 </span>
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
-                    className="text-[10px] font-bold text-brand-650 hover:text-brand-700 dark:text-brand-400"
+                    className="text-[10px] font-bold text-brand-650 hover:text-brand-700"
                   >
                     Mark all read
                   </button>
                 )}
               </div>
 
-              <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-750 no-scrollbar">
+              <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 no-scrollbar">
                 {notifications.length === 0 ? (
-                  <div className="px-4 py-6 text-center text-xs text-slate-500 dark:text-slate-400">
+                  <div className="px-4 py-6 text-center text-xs text-slate-500">
                     No notifications
                   </div>
                 ) : (
@@ -103,19 +92,16 @@ const Navbar = ({ onToggleSidebar }) => {
                     <div
                       key={n.id}
                       onClick={() => markAsRead(n.id)}
-                      className={`
-                        p-3.5 flex items-start gap-2.5 transition-colors cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/30
-                        ${!n.read ? 'bg-brand-50/20 dark:bg-brand-950/5' : ''}
-                      `}
+                      className={`p-3.5 flex items-start gap-2.5 transition-colors cursor-pointer hover:bg-slate-50 ${!n.read ? 'bg-brand-50/20 ' : ''}`}
                     >
                       <div className="flex-1">
-                        <p className={`text-xs ${!n.read ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-705 dark:text-slate-300'}`}>
+                        <p className={`text-xs ${!n.read ? 'font-bold text-slate-900 ' : 'text-slate-705 '}`}>
                           {n.title}
                         </p>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-450 mt-0.5 leading-relaxed">
+                        <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
                           {n.message}
                         </p>
-                        <span className="text-[8px] text-slate-400 dark:text-slate-550 block mt-1">
+                        <span className="text-[8px] text-slate-400 block mt-1">
                           {formatDate(n.createdAt, 'DD MMM, hh:mm A')}
                         </span>
                       </div>
@@ -128,7 +114,7 @@ const Navbar = ({ onToggleSidebar }) => {
                               e.stopPropagation();
                               markAsRead(n.id);
                             }}
-                            className="p-1 rounded text-slate-400 hover:text-brand-600 dark:hover:text-brand-400"
+                            className="p-1 rounded text-slate-400 hover:text-brand-600"
                             title="Mark as Read"
                           >
                             <FiCheck className="h-3 w-3" />
@@ -151,11 +137,11 @@ const Navbar = ({ onToggleSidebar }) => {
                 )}
               </div>
 
-              <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-750 text-center">
+              <div className="px-4 py-2 bg-slate-50 border-t border-slate-100 text-center">
                 <Link
                   to={user?.role === 'admin' ? '/admin/notifications' : user?.role === 'customer' ? '/customer/notifications' : '/agent/notifications'}
                   onClick={() => setShowNotificationsMenu(false)}
-                  className="text-[10px] font-bold text-brand-650 dark:text-brand-400 hover:underline"
+                  className="text-[10px] font-bold text-brand-650 hover:underline"
                 >
                   View Notification Center
                 </Link>
@@ -168,7 +154,7 @@ const Navbar = ({ onToggleSidebar }) => {
         <div className="relative" ref={profileRef}>
           <button
             onClick={() => setShowProfileMenu((prev) => !prev)}
-            className="flex items-center gap-2 p-1.5 rounded-xl border border-slate-200 dark:border-slate-750 bg-white dark:bg-slate-850 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left shadow-subtle"
+            className="flex items-center gap-2 p-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all text-left shadow-subtle"
           >
             <img
               src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
@@ -179,12 +165,12 @@ const Navbar = ({ onToggleSidebar }) => {
           </button>
 
           {showProfileMenu && (
-            <div className="absolute right-0 mt-2 w-48 rounded-xl border border-slate-205 dark:border-slate-750 bg-white dark:bg-slate-800 shadow-hover z-40 overflow-hidden py-1">
-              <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-750">
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+            <div className="absolute right-0 mt-2 w-48 rounded-xl border border-slate-200 bg-white shadow-hover z-40 overflow-hidden py-1">
+              <div className="px-4 py-2 border-b border-slate-100">
+                <p className="text-xs font-bold text-slate-800 truncate">
                   {user?.name}
                 </p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                <p className="text-[10px] text-slate-500 truncate">
                   {user?.email}
                 </p>
               </div>
@@ -192,7 +178,7 @@ const Navbar = ({ onToggleSidebar }) => {
               <Link
                 to={user?.role === 'admin' ? '/admin/settings' : user?.role === 'customer' ? '/customer/profile' : '/agent/profile'}
                 onClick={() => setShowProfileMenu(false)}
-                className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-250 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
               >
                 <FiUser className="h-4 w-4" />
                 <span>My Profile</span>
@@ -201,7 +187,7 @@ const Navbar = ({ onToggleSidebar }) => {
               <Link
                 to={user?.role === 'admin' ? '/admin/settings' : user?.role === 'customer' ? '/customer/settings' : '/agent/settings'}
                 onClick={() => setShowProfileMenu(false)}
-                className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-250 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
               >
                 <FiSettings className="h-4 w-4" />
                 <span>Settings</span>
@@ -212,7 +198,7 @@ const Navbar = ({ onToggleSidebar }) => {
                   setShowProfileMenu(false);
                   logout();
                 }}
-                className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-xs font-semibold text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 border-t border-slate-100 dark:border-slate-750 transition-colors"
+                className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-xs font-semibold text-red-650 hover:bg-red-50 border-t border-slate-100 transition-colors"
               >
                 <FiLogOut className="h-4 w-4" />
                 <span>Sign Out</span>

@@ -50,15 +50,15 @@ const OtpVerification = ({ onVerify, loading = false, expectedOtp = '1234' }) =>
 
   return (
     <div className="flex flex-col items-center justify-center p-4">
-      <div className="p-3 bg-brand-50 dark:bg-brand-950/20 text-brand-650 dark:text-brand-400 rounded-full mb-4">
+      <div className="p-3 bg-brand-50 text-brand-650 rounded-full mb-4">
         <FiLock className="h-6 w-6" />
       </div>
       
-      <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+      <h3 className="text-base font-semibold text-slate-900">
         OTP Delivery Verification
       </h3>
-      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 text-center max-w-xs leading-relaxed">
-        Please ask the customer for their security pass-code (Default: <span className="font-bold text-slate-700 dark:text-slate-350">{expectedOtp}</span>)
+      <p className="text-xs text-slate-500 mt-1 text-center max-w-xs leading-relaxed">
+        Please ask the customer for their security pass-code (Default: <span className="font-bold text-slate-700">{expectedOtp}</span>)
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 w-full space-y-6">
@@ -73,11 +73,7 @@ const OtpVerification = ({ onVerify, loading = false, expectedOtp = '1234' }) =>
               value={digit}
               onChange={(e) => handleChange(idx, e.target.value)}
               onKeyDown={(e) => handleKeyDown(idx, e)}
-              className="
-                w-12 h-14 text-center text-xl font-bold rounded-xl border border-slate-305 dark:border-slate-700
-                focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white dark:bg-slate-800
-                text-slate-900 dark:text-slate-100 transition-all shadow-subtle
-              "
+              className="w-12 h-14 text-center text-xl font-bold rounded-xl border border-slate-305 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white text-slate-900 transition-all shadow-subtle"
             />
           ))}
         </div>

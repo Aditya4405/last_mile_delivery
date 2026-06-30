@@ -43,7 +43,7 @@ const AssignedShipments = () => {
       key: 'id',
       label: 'Order ID',
       sortable: true,
-      render: (val) => <span className="font-bold text-brand-605">{val}</span>,
+      render: (val) => <span className="font-bold text-brand-600">{val}</span>,
     },
     { key: 'dropAddress', label: 'Drop Destination', render: (val) => <span className="truncate max-w-[180px] block">{val}</span> },
     { key: 'paymentType', label: 'Billing Mode' },
@@ -60,7 +60,7 @@ const AssignedShipments = () => {
               <Button size="sm" variant="primary" icon={FiTruck}>Update</Button>
             </Link>
           ) : (
-            <span className="text-xxs text-slate-400 font-bold bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">RESOLVED</span>
+            <span className="text-xxs text-slate-400 font-bold bg-slate-100 px-2 py-1 rounded">RESOLVED</span>
           )}
         </div>
       ),
@@ -70,16 +70,16 @@ const AssignedShipments = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-          <FiList className="text-brand-655" />
+        <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <FiList className="text-brand-600" />
           Assigned Shipping Orders
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Inspect and log progress for all packages assigned to your delivery schedule.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-205 dark:border-slate-750 shadow-subtle">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-subtle">
         <SearchBar
           value={search}
           onChange={setSearch}

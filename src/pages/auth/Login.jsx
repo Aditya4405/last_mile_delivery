@@ -43,13 +43,13 @@ const Login = () => {
   // Quick fill credentials for demo
   const quickFill = (role) => {
     if (role === 'admin') {
-      setValue('email', 'admin@swiftroute.com');
+      setValue('email', 'admin@logitrack.com');
       setValue('password', 'password123');
     } else if (role === 'customer') {
-      setValue('email', 'customer@swiftroute.com');
+      setValue('email', 'customer@logitrack.com');
       setValue('password', 'password123');
     } else if (role === 'agent') {
-      setValue('email', 'agent@swiftroute.com');
+      setValue('email', 'agent@logitrack.com');
       setValue('password', 'password123');
     }
     toast.success(`${role.toUpperCase()} credentials filled!`);
@@ -58,10 +58,10 @@ const Login = () => {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+        <h2 className="text-xl font-bold text-slate-900">
           Sign in to your account
         </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Welcome back! Access your tracking dashboards
         </p>
       </div>
@@ -104,17 +104,17 @@ const Login = () => {
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute top-[38px] right-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-205 focus:outline-none"
+            className="absolute top-[38px] right-3 text-slate-400 hover:text-slate-650 focus:outline-none"
           >
             {showPassword ? <FiEyeOff className="h-4.5 w-4.5" /> : <FiEye className="h-4.5 w-4.5" />}
           </button>
         </div>
 
         <div className="flex items-center justify-between">
-          <label className="flex items-center text-xs text-slate-600 dark:text-slate-400 cursor-pointer">
+          <label className="flex items-center text-xs text-slate-600 cursor-pointer">
             <input
               type="checkbox"
-              className="rounded border-slate-300 text-brand-605 focus:ring-brand-500 mr-2 h-4 w-4"
+              className="rounded border-slate-300 text-brand-600 focus:ring-brand-500 mr-2 h-4 w-4"
               {...register('rememberMe')}
             />
             Remember me
@@ -122,7 +122,7 @@ const Login = () => {
 
           <Link
             to="/forgot-password"
-            className="text-xs font-semibold text-brand-650 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-350"
+            className="text-xs font-semibold text-brand-650 hover:text-brand-700"
           >
             Forgot Password?
           </Link>
@@ -134,11 +134,11 @@ const Login = () => {
       </form>
 
       <div className="text-center">
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-slate-500">
           Don't have an account?{' '}
           <Link
             to="/register"
-            className="font-bold text-brand-650 hover:text-brand-750 dark:text-brand-400 dark:hover:text-brand-305"
+            className="font-bold text-brand-650 hover:text-brand-750"
           >
             Create Account
           </Link>
@@ -146,15 +146,15 @@ const Login = () => {
       </div>
 
       {/* Quick Access Demo Shortcut Panel */}
-      <div className="pt-4 border-t border-slate-100 dark:border-slate-750">
-        <p className="text-xxs font-bold text-center text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2.5">
+      <div className="pt-4 border-t border-slate-100">
+        <p className="text-xxs font-bold text-center text-slate-400 uppercase tracking-wider mb-2.5">
           Quick Access Mock Roles
         </p>
         <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
             onClick={() => quickFill('customer')}
-            className="flex flex-col items-center justify-center py-2 px-1 border border-slate-200 dark:border-slate-700 hover:border-brand-500 dark:hover:border-brand-500 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-750 transition-all text-slate-650 dark:text-slate-350"
+            className="flex flex-col items-center justify-center py-2 px-1 border border-slate-200 hover:border-brand-500 rounded-lg hover:bg-slate-50 transition-all text-slate-650"
           >
             <FiUser className="h-4 w-4 mb-1 text-sky-500" />
             <span className="text-[9px] font-bold">Customer</span>
@@ -162,7 +162,7 @@ const Login = () => {
           <button
             type="button"
             onClick={() => quickFill('agent')}
-            className="flex flex-col items-center justify-center py-2 px-1 border border-slate-200 dark:border-slate-700 hover:border-brand-500 dark:hover:border-brand-500 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-750 transition-all text-slate-650 dark:text-slate-350"
+            className="flex flex-col items-center justify-center py-2 px-1 border border-slate-200 hover:border-brand-500 rounded-lg hover:bg-slate-50 transition-all text-slate-650"
           >
             <FiTruck className="h-4 w-4 mb-1 text-emerald-500" />
             <span className="text-[9px] font-bold">Agent</span>
@@ -170,7 +170,7 @@ const Login = () => {
           <button
             type="button"
             onClick={() => quickFill('admin')}
-            className="flex flex-col items-center justify-center py-2 px-1 border border-slate-200 dark:border-slate-700 hover:border-brand-500 dark:hover:border-brand-500 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-750 transition-all text-slate-650 dark:text-slate-350"
+            className="flex flex-col items-center justify-center py-2 px-1 border border-slate-200 hover:border-brand-500 rounded-lg hover:bg-slate-50 transition-all text-slate-650"
           >
             <FiShield className="h-4 w-4 mb-1 text-indigo-500" />
             <span className="text-[9px] font-bold">Admin</span>

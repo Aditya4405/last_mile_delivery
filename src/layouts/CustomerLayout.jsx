@@ -33,7 +33,7 @@ const CustomerLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-905 flex transition-colors duration-200">
+    <div className="min-h-screen bg-slate-50 flex transition-colors duration-200">
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}

@@ -98,7 +98,7 @@ const ManageZones = () => {
   };
 
   const columns = [
-    { key: 'code', label: 'Zone Code', render: (val) => <span className="font-bold text-brand-655">{val}</span> },
+    { key: 'code', label: 'Zone Code', render: (val) => <span className="font-bold text-brand-600">{val}</span> },
     { key: 'name', label: 'Zone Name' },
     { key: 'description', label: 'Description', render: (val) => <span className="truncate max-w-[200px] block">{val}</span> },
     {
@@ -121,11 +121,11 @@ const ManageZones = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-909 dark:text-white flex items-center gap-2">
-            <FiMap className="text-brand-655" />
+          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <FiMap className="text-brand-600" />
             Manage Zones
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Configure geographic zones, routing boundaries, and operational nodes.
           </p>
         </div>
@@ -134,7 +134,7 @@ const ManageZones = () => {
         </Button>
       </div>
 
-      <div className="bg-white dark:bg-slate-805 p-4 rounded-xl border border-slate-205 dark:border-slate-750 shadow-subtle">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-subtle">
         <SearchBar value={search} onChange={setSearch} onClear={() => setSearch('')} placeholder="Search by name or code..." />
       </div>
 
@@ -171,7 +171,7 @@ const ManageZones = () => {
             {...register('description')}
           />
 
-          <div className="flex justify-end gap-3 pt-4 border-t dark:border-slate-750">
+          <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={() => setShowFormModal(false)} disabled={modalLoading}>
               Cancel
             </Button>

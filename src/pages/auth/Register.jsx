@@ -42,10 +42,10 @@ const Register = () => {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+        <h2 className="text-xl font-bold text-slate-900">
           Create a Customer Account
         </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Register to book packages and track orders
         </p>
       </div>
@@ -100,7 +100,7 @@ const Register = () => {
           name="phone"
           type="tel"
           icon={FiPhone}
-          placeholder="+1 (555) 012-3456"
+          placeholder="+91 98765 43210"
           error={errors.phone}
           required
           {...register('phone', { required: 'Phone number is required' })}
@@ -111,13 +111,13 @@ const Register = () => {
             label="Address"
             name="address"
             icon={FiMapPin}
-            placeholder="123 Main St"
+            placeholder="Sector 62, Noida"
             className="col-span-2"
             error={errors.address}
             {...register('address')}
           />
           <Input
-            label="Zip Code"
+            label="Pincode"
             name="zip"
             icon={FiCompass}
             placeholder="110001"
@@ -132,11 +132,11 @@ const Register = () => {
       </form>
 
       <div className="text-center">
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-slate-500">
           Already have an account?{' '}
           <Link
             to="/login"
-            className="font-bold text-brand-650 hover:text-brand-750 dark:text-brand-400 dark:hover:text-brand-305"
+            className="font-bold text-brand-650 hover:text-brand-750"
           >
             Sign In
           </Link>

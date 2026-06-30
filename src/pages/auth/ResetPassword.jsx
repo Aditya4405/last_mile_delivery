@@ -43,10 +43,10 @@ const ResetPassword = () => {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+        <h2 className="text-xl font-bold text-slate-900">
           Reset Password
         </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Verify the OTP and enter your new password
         </p>
       </div>
@@ -99,7 +99,7 @@ const ResetPassword = () => {
       <div className="text-center">
         <Link
           to="/login"
-          className="inline-flex items-center text-xs font-semibold text-slate-555 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-205"
+          className="inline-flex items-center text-xs font-semibold text-slate-500 hover:text-slate-700"
         >
           <FiArrowLeft className="mr-1.5" /> Back to Sign In
         </Link>

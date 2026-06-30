@@ -147,14 +147,14 @@ const ManageCustomers = () => {
       render: (val, row) => (
         <div className="flex items-center gap-2.5">
           <img src={row.avatar} alt="avatar" className="w-8 h-8 rounded-full object-cover border" />
-          <span className="font-semibold text-slate-800 dark:text-slate-200">{val}</span>
+          <span className="font-semibold text-slate-800">{val}</span>
         </div>
       ),
     },
     { key: 'email', label: 'Email' },
     { key: 'phone', label: 'Phone', render: (val) => val || '-' },
     { key: 'address', label: 'Billing Base Address', render: (val) => <span className="truncate max-w-[150px] block">{val || '-'}</span> },
-    { key: 'zip', label: 'Zip', render: (val) => val || '-' },
+    { key: 'zip', label: 'Pincode', render: (val) => val || '-' },
     {
       key: 'actions',
       label: 'Actions',
@@ -175,11 +175,11 @@ const ManageCustomers = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-909 dark:text-white flex items-center gap-2">
-            <FiUsers className="text-brand-655" />
+          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <FiUsers className="text-brand-600" />
             Manage Customers
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Create, update, and remove client accounts in the system directory.
           </p>
         </div>
@@ -188,7 +188,7 @@ const ManageCustomers = () => {
         </Button>
       </div>
 
-      <div className="bg-white dark:bg-slate-805 p-4 rounded-xl border border-slate-205 dark:border-slate-750 shadow-subtle">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-subtle">
         <SearchBar value={search} onChange={setSearch} onClear={() => setSearch('')} placeholder="Search by name or email..." />
       </div>
 
@@ -224,7 +224,7 @@ const ManageCustomers = () => {
           <Input
             label="Phone Number"
             name="phone"
-            placeholder="+1 (555) 012-3456"
+            placeholder="+91 98765 43210"
             error={errors.phone}
             {...register('phone')}
           />
@@ -234,12 +234,12 @@ const ManageCustomers = () => {
               label="Billing Address"
               name="address"
               className="col-span-2"
-              placeholder="123 Main St"
+              placeholder="Sector 62, Noida"
               error={errors.address}
               {...register('address')}
             />
             <Input
-              label="Zip"
+              label="Pincode"
               name="zip"
               placeholder="110001"
               error={errors.zip}
@@ -247,7 +247,7 @@ const ManageCustomers = () => {
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t dark:border-slate-750">
+          <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={() => setShowFormModal(false)} disabled={modalLoading}>
               Cancel
             </Button>

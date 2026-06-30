@@ -1,156 +1,192 @@
-import React, { useEffect, useState } from 'react';
-import { FiMapPin, FiNavigation, FiInfo } from 'react-icons/fi';
-import { motion } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import { FiMapPin, FiTruck } from 'react-icons/fi';
+
+// Fallback coordinate mappings for our Indian Zones to enable smooth visualization
+const ZONE_COORDS = {
+  'zone-1': [28.625, 77.37],  // North Zone / Noida Area
+  'zone-2': [28.46, 77.03],   // South Zone / Gurgaon Area
+  'zone-3': [28.54, 77.28],   // East Zone / Okhla Area
+  'zone-4': [28.57, 77.19],   // West Zone / Dwarka/West Delhi Area
+  'zone-5': [28.63, 77.22],   // Central Zone / Connaught Place Area
+};
 
 const MapPlaceholder = ({
-  pickupAddress = 'Pickup Location',
-  dropAddress = 'Drop Location',
+  pickupAddress = 'Noida',
+  dropAddress = 'New Delhi',
   status = 'assigned',
-  agentName = 'Delivery Agent',
+  agentName = 'Rider Agent',
+  pickupZone = 'zone-1',
+  dropZone = 'zone-5',
+  agentLat = null,
+  agentLng = null,
 }) => {
-  const [progress, setProgress] = useState(0.2);
+  const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
+  const markersRef = useRef({ pickup: null, drop: null, agent: null });
+  const routeLineRef = useRef(null);
+
+  // Parse coordinate origins
+  const pickupLatLng = ZONE_COORDS[pickupZone] || ZONE_COORDS['zone-1'];
+  const dropLatLng = ZONE_COORDS[dropZone] || ZONE_COORDS['zone-5'];
 
   useEffect(() => {
-    // Map progress factor depending on order status
-    switch (status) {
-      case 'pending':
-        setProgress(0.0);
-        break;
-      case 'assigned':
-        setProgress(0.15);
-        break;
-      case 'picked_up':
-        setProgress(0.35);
-        break;
-      case 'in_transit':
-        setProgress(0.6);
-        break;
-      case 'out_for_delivery':
-        setProgress(0.85);
-        break;
-      case 'delivered':
-        setProgress(1.0);
-        break;
-      case 'failed':
-        setProgress(0.7);
-        break;
-      default:
-        setProgress(0.5);
+    // Initialize leaflet map if not already done
+    if (!mapRef.current && mapContainerRef.current) {
+      mapRef.current = L.map(mapContainerRef.current, {
+        zoomControl: false,
+        attributionControl: false,
+      }).setView(pickupLatLng, 12);
+
+      // OpenStreetMap premium tile styles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+      }).addTo(mapRef.current);
+
+      // Add zoom control to bottom right
+      L.control.zoom({
+        position: 'bottomright',
+      }).addTo(mapRef.current);
     }
-  }, [status]);
 
-  // Coordinates on our 500x300 grid
-  const pickup = { x: 80, y: 220 };
-  const drop = { x: 420, y: 80 };
-  
-  // Interpolated agent coordinate along a winding curve
-  // Route curve control points: pickup (80,220) -> CP1 (200, 260) -> CP2 (300, 60) -> drop (420,80)
-  const getRoutePoint = (t) => {
-    const x = (1 - t) ** 3 * pickup.x + 3 * (1 - t) ** 2 * t * 220 + 3 * (1 - t) * t ** 2 * 280 + t ** 3 * drop.x;
-    const y = (1 - t) ** 3 * pickup.y + 3 * (1 - t) ** 2 * t * 240 + 3 * (1 - t) * t ** 2 * 60 + t ** 3 * drop.y;
-    return { x, y };
-  };
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
 
-  const agentPos = getRoutePoint(progress);
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const map = mapRef.current;
+
+    // Remove existing markers
+    if (markersRef.current.pickup) map.removeLayer(markersRef.current.pickup);
+    if (markersRef.current.drop) map.removeLayer(markersRef.current.drop);
+    if (markersRef.current.agent) map.removeLayer(markersRef.current.agent);
+    if (routeLineRef.current) map.removeLayer(routeLineRef.current);
+
+    // Create custom leaflet HTML markers using Tailwind
+    const pickupIcon = L.divIcon({
+      html: `
+        <div class="relative flex items-center justify-center w-8 h-8">
+          <div class="absolute w-8 h-8 bg-orange-500 rounded-full opacity-20 animate-ping"></div>
+          <div class="relative w-6 h-6 bg-orange-500 border-2 border-white rounded-full shadow-lg flex items-center justify-center text-white">
+            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle>
+            </svg>
+          </div>
+        </div>
+      `,
+      className: 'custom-div-icon',
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+
+    const dropIcon = L.divIcon({
+      html: `
+        <div class="relative flex items-center justify-center w-8 h-8">
+          <div class="absolute w-8 h-8 bg-emerald-500 rounded-full opacity-20 animate-ping"></div>
+          <div class="relative w-6 h-6 bg-emerald-500 border-2 border-white rounded-full shadow-lg flex items-center justify-center text-white">
+            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle>
+            </svg>
+          </div>
+        </div>
+      `,
+      className: 'custom-div-icon',
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+
+    // Add pickup and drop markers
+    markersRef.current.pickup = L.marker(pickupLatLng, { icon: pickupIcon })
+      .addTo(map)
+      .bindPopup(`<b>Pickup Location</b><br/>${pickupAddress}`);
+
+    markersRef.current.drop = L.marker(dropLatLng, { icon: dropIcon })
+      .addTo(map)
+      .bindPopup(`<b>Drop Location</b><br/>${dropAddress}`);
+
+    // Determine agent coordinates
+    let currentAgentLatLng = null;
+    if (status !== 'pending' && status !== 'delivered' && status !== 'failed') {
+      if (agentLat && agentLng) {
+        currentAgentLatLng = [agentLat, agentLng];
+      } else {
+        // Interpolate position based on status
+        let factor = 0.2;
+        if (status === 'picked_up') factor = 0.4;
+        else if (status === 'in_transit') factor = 0.65;
+        else if (status === 'out_for_delivery') factor = 0.85;
+
+        currentAgentLatLng = [
+          pickupLatLng[0] + (dropLatLng[0] - pickupLatLng[0]) * factor,
+          pickupLatLng[1] + (dropLatLng[1] - pickupLatLng[1]) * factor,
+        ];
+      }
+    }
+
+    // Add Agent marker if in-transit
+    if (currentAgentLatLng) {
+      const agentIcon = L.divIcon({
+        html: `
+          <div class="relative flex items-center justify-center w-9 h-9">
+            <div class="absolute w-9 h-9 bg-blue-600 rounded-full opacity-25 animate-ping"></div>
+            <div class="relative w-7 h-7 bg-blue-600 border-2 border-white rounded-full shadow-lg flex items-center justify-center text-white">
+              <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle>
+              </svg>
+            </div>
+            <span class="absolute -bottom-4 bg-blue-900 text-white font-extrabold text-[8px] px-1 rounded shadow truncate max-w-[64px]">${agentName.split(' ')[0]}</span>
+          </div>
+        `,
+        className: 'custom-div-icon',
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
+      });
+
+      markersRef.current.agent = L.marker(currentAgentLatLng, { icon: agentIcon })
+        .addTo(map)
+        .bindPopup(`<b>Courier Agent: ${agentName}</b><br/>Status: <span class="capitalize font-semibold">${status.replace('_', ' ')}</span>`);
+    }
+
+    // Add route line polyline connecting pickup, agent (if present), and drop
+    const routePoints = [pickupLatLng];
+    if (currentAgentLatLng) {
+      routePoints.push(currentAgentLatLng);
+    }
+    routePoints.push(dropLatLng);
+
+    routeLineRef.current = L.polyline(routePoints, {
+      color: '#2563eb', // Royal Blue
+      weight: 3.5,
+      opacity: 0.8,
+      dashArray: '6, 6',
+    }).addTo(map);
+
+    // Fit map bounds to show all markers
+    const group = new L.featureGroup(
+      [markersRef.current.pickup, markersRef.current.drop, markersRef.current.agent].filter(Boolean)
+    );
+    map.fitBounds(group.getBounds().pad(0.15));
+
+  }, [pickupAddress, dropAddress, status, agentName, pickupZone, dropZone, agentLat, agentLng]);
 
   return (
-    <div className="relative w-full rounded-xl overflow-hidden border border-slate-200 dark:border-slate-750 bg-slate-100 dark:bg-slate-950/60 shadow-card">
-      {/* Top Banner Status */}
-      <div className="absolute top-3 left-3 right-3 z-10 bg-white/90 dark:bg-slate-800/90 backdrop-blur px-3.5 py-2 rounded-lg shadow-subtle border border-slate-200/50 dark:border-slate-700/80 flex items-center justify-between text-xs">
-        <div className="flex items-center gap-2 text-slate-750 dark:text-slate-205">
-          <FiNavigation className="text-brand-600 dark:text-brand-400 animate-pulse" />
-          <span className="font-semibold truncate max-w-[180px]">
-            Route: {pickupAddress.split(',')[0]} → {dropAddress.split(',')[0]}
-          </span>
+    <div className="relative w-full h-[320px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-card">
+      <div ref={mapContainerRef} className="w-full h-full z-10" />
+
+      {/* Floating telemetry headers */}
+      <div className="absolute top-3 left-3 right-3 z-20 pointer-events-none flex gap-2 justify-between">
+        <div className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-lg shadow-subtle border border-slate-200/50 text-[10px] font-semibold text-slate-700 pointer-events-auto">
+          Route: {pickupAddress.split(',')[0]} → {dropAddress.split(',')[0]}
         </div>
-        <div className="font-bold text-brand-650 dark:text-brand-400 uppercase tracking-wider">
-          {Math.round(progress * 100)}% Transit
+        <div className="bg-blue-600 text-white px-2.5 py-1.5 rounded-lg shadow-subtle text-[9px] font-extrabold uppercase tracking-widest pointer-events-auto flex items-center gap-1.5">
+          <FiTruck /> GPS Active
         </div>
-      </div>
-
-      {/* SVG Canvas Map */}
-      <svg viewBox="0 0 500 300" className="w-full h-auto aspect-[5/3] block bg-slate-50 dark:bg-slate-900/60 transition-colors">
-        {/* Map Grid Gridlines */}
-        <defs>
-          <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
-            <path d="M 25 0 L 0 0 0 25" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-slate-200 dark:text-slate-800" />
-          </pattern>
-        </defs>
-        <rect width="500" height="300" fill="url(#grid)" />
-
-        {/* Custom City Roads Layout Lines */}
-        <g stroke="currentColor" strokeWidth="6" strokeLinecap="round" className="text-slate-200 dark:text-slate-800/80 opacity-60">
-          <line x1="50" y1="50" x2="450" y2="50" />
-          <line x1="50" y1="150" x2="450" y2="150" />
-          <line x1="50" y1="250" x2="450" y2="250" />
-          <line x1="120" y1="20" x2="120" y2="280" />
-          <line x1="260" y1="20" x2="260" y2="280" />
-          <line x1="380" y1="20" x2="380" y2="280" />
-        </g>
-
-        {/* Actual Winding Route Path */}
-        <path
-          d={`M ${pickup.x} ${pickup.y} C 220 240, 280 60, ${drop.x} ${drop.y}`}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3.5"
-          strokeDasharray="6,4"
-          className="text-slate-350 dark:text-slate-650"
-        />
-
-        {/* Covered Route Path (Active highlight) */}
-        {progress > 0 && (
-          <path
-            d={`M ${pickup.x} ${pickup.y} C 220 240, 280 60, ${drop.x} ${drop.y}`}
-            fill="none"
-            stroke="#6366f1"
-            strokeWidth="3.5"
-            strokeDasharray="6,4"
-            strokeDashoffset="0"
-            className="animate-[dash_10s_linear_infinite]"
-            style={{
-              clipPath: `polygon(0 0, ${agentPos.x + 10}px 0, ${agentPos.x + 10}px 100%, 0 100%)`
-            }}
-          />
-        )}
-
-        {/* Pickup Marker */}
-        <g transform={`translate(${pickup.x}, ${pickup.y})`}>
-          <circle r="14" fill="#0ea5e9" className="opacity-20 animate-ping" />
-          <circle r="7" fill="#0ea5e9" stroke="#ffffff" strokeWidth="2" />
-          <text y="-14" textAnchor="middle" className="fill-slate-600 dark:fill-slate-400 font-bold text-[9px]">PICKUP</text>
-        </g>
-
-        {/* Destination Drop Marker */}
-        <g transform={`translate(${drop.x}, ${drop.y})`}>
-          <circle r="14" fill="#10b981" className="opacity-20 animate-ping" />
-          <circle r="7" fill="#10b981" stroke="#ffffff" strokeWidth="2" />
-          <text y="-14" textAnchor="middle" className="fill-slate-600 dark:fill-slate-400 font-bold text-[9px]">DROP</text>
-        </g>
-
-        {/* Live Delivery Agent Truck Icon Marker */}
-        {progress < 1.0 && progress > 0.0 && (
-          <g transform={`translate(${agentPos.x}, ${agentPos.y})`}>
-            {/* Pulsing radar */}
-            <circle r="18" fill="#6366f1" className="opacity-25 animate-ping" />
-            <circle r="11" fill="#6366f1" stroke="#ffffff" strokeWidth="2" />
-            <g transform="translate(-6, -6) scale(0.6)" fill="#ffffff">
-              <path d="M19 10h-2V7c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v10h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm2-5.5h-3V8.5h3v4.5z" />
-            </g>
-            <text y="-16" textAnchor="middle" className="fill-brand-600 dark:fill-brand-400 font-extrabold text-[8px] tracking-wide uppercase">{agentName.split(' ')[0]}</text>
-          </g>
-        )}
-      </svg>
-
-      {/* Bottom Floating Info */}
-      <div className="absolute bottom-3 left-3 right-3 bg-slate-900/80 backdrop-blur px-3 py-2 rounded-lg text-white text-xxs flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          <FiInfo className="text-sky-400" />
-          <span className="text-[10px] font-medium text-slate-300">
-            {status === 'delivered' ? 'Shipment delivered successfully!' : `Agent is moving to drop zone.`}
-          </span>
-        </div>
-        <span className="text-[9px] text-slate-400 font-mono">GPS ACTIVE</span>
       </div>
     </div>
   );

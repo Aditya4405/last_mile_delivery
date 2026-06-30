@@ -55,7 +55,7 @@ const AgentDashboard = () => {
     {
       key: 'id',
       label: 'Order ID',
-      render: (val) => <span className="font-bold text-brand-605">{val}</span>,
+      render: (val) => <span className="font-bold text-brand-600">{val}</span>,
     },
     { key: 'pickupAddress', label: 'Pickup Point', render: (val) => <span className="truncate max-w-[150px] block">{val}</span> },
     { key: 'dropAddress', label: 'Drop Point', render: (val) => <span className="truncate max-w-[150px] block">{val}</span> },
@@ -75,30 +75,24 @@ const AgentDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Shift Toggle Banner */}
-      <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card flex items-center justify-between flex-wrap gap-4">
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-card flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-909 dark:text-white">Courier Shift Panel</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <h1 className="text-xl font-bold text-slate-900">Courier Shift Panel</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
             Toggle availability status to receive route dispatches.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className={`text-xs font-bold ${availability ? 'text-success-605' : 'text-slate-400'}`}>
+          <span className={`text-xs font-bold ${availability ? 'text-success-600' : 'text-slate-400'}`}>
             {availability ? 'ONLINE & ACTIVE' : 'OFFLINE (SHIFTS CLOSED)'}
           </span>
           <button
             onClick={handleToggleAvailability}
-            className={`
-              w-12 h-7 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300
-              ${availability ? 'bg-success-500' : 'bg-slate-300 dark:bg-slate-700'}
-            `}
+            className={`w-12 h-7 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${availability ? 'bg-success-500' : 'bg-slate-300 '}`}
           >
             <div
-              className={`
-                bg-white w-5 h-5 rounded-full shadow transform transition-transform duration-300
-                ${availability ? 'translate-x-5' : 'translate-x-0'}
-              `}
+              className={`bg-white w-5 h-5 rounded-full shadow transform transition-transform duration-300 ${availability ? 'translate-x-5' : 'translate-x-0'}`}
             />
           </button>
         </div>
@@ -107,24 +101,24 @@ const AgentDashboard = () => {
       {/* Metrics Row */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatsCard
-          title="Today's Dispatches"
+          title="Today's Shipments"
           value={stats?.cards?.todayDeliveries || 0}
           icon={FiTruck}
           loading={loading}
         />
         <StatsCard
-          title="Pickups Pending"
+          title="Pending Pickups"
           value={stats?.cards?.pendingPickups || 0}
           icon={FiPackage}
-          iconBg="bg-amber-50 dark:bg-amber-950/20"
+          iconBg="bg-amber-50 "
           iconColor="text-amber-600"
           loading={loading}
         />
         <StatsCard
-          title="Delivered Handouts"
+          title="Delivered Today"
           value={stats?.cards?.completedDeliveries || 0}
           icon={FiCheckCircle}
-          iconBg="bg-success-50 dark:bg-success-950/20"
+          iconBg="bg-success-50 "
           iconColor="text-success-600"
           loading={loading}
         />
@@ -132,15 +126,15 @@ const AgentDashboard = () => {
           title="Failed Attempts"
           value={stats?.cards?.failedDeliveries || 0}
           icon={FiAlertCircle}
-          iconBg="bg-red-50 dark:bg-red-955/10"
+          iconBg="bg-red-50 "
           iconColor="text-red-600"
           loading={loading}
         />
         <StatsCard
-          title="Performance Rating"
+          title="Executive Rating"
           value={`${stats?.cards?.rating || 5.0} / 5.0`}
           icon={FiStar}
-          iconBg="bg-primary-50 dark:bg-primary-955/10"
+          iconBg="bg-primary-50 "
           iconColor="text-primary-600"
           className="col-span-2 lg:col-span-1"
           loading={loading}
@@ -151,7 +145,7 @@ const AgentDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Active route preview mapping */}
         <div className="lg:col-span-2 space-y-4">
-          <h3 className="text-xs font-bold text-slate-850 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
             <FiActivity className="text-brand-500" />
             Active Route Mapping
           </h3>
@@ -163,7 +157,7 @@ const AgentDashboard = () => {
               agentName={user.name}
             />
           ) : (
-            <div className="bg-white dark:bg-slate-800 border p-12 text-center rounded-xl text-xs text-slate-500">
+            <div className="bg-white border p-12 text-center rounded-xl text-xs text-slate-500">
               No active transits. Open availability switch to accept courier tickets.
             </div>
           )}
@@ -171,15 +165,15 @@ const AgentDashboard = () => {
 
         {/* Dispatch lists info */}
         <div className="space-y-4">
-          <h3 className="text-xs font-bold text-slate-855 dark:text-slate-205 uppercase tracking-wider">
+          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
             Shift Workload Guidelines
           </h3>
-          <div className="bg-white dark:bg-slate-850 p-4 rounded-xl border border-slate-200 dark:border-slate-750 text-xxs text-slate-500 dark:text-slate-400 space-y-3">
+          <div className="bg-white p-4 rounded-xl border border-slate-200 text-xxs text-slate-500 space-y-3">
             <p>
-              <strong className="text-slate-700 dark:text-slate-200">1. Verification OTPs:</strong> All delivery handouts must conclude with matching customer safety passcodes (System default: <strong className="text-slate-800 dark:text-white">1234</strong>).
+              <strong className="text-slate-700">1. Verification OTPs:</strong> All delivery handouts must conclude with matching customer safety passcodes (System default: <strong className="text-slate-800">1234</strong>).
             </p>
             <p>
-              <strong className="text-slate-700 dark:text-slate-200">2. Issue Uploads:</strong> In case of failed attempts, specify exact reasoning descriptions (e.g. customer unavailable, building closed) and note details inside telemetry flags.
+              <strong className="text-slate-700">2. Issue Uploads:</strong> In case of failed attempts, specify exact reasoning descriptions (e.g. customer unavailable, building closed) and note details inside telemetry flags.
             </p>
           </div>
         </div>
@@ -187,8 +181,8 @@ const AgentDashboard = () => {
 
       {/* Active Jobs Grid */}
       <div className="space-y-3">
-        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-          Assigned Shipping Manifests
+        <h3 className="text-sm font-bold text-slate-900">
+          Assigned Orders
         </h3>
         <Table
           columns={columns}

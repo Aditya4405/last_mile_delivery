@@ -123,7 +123,7 @@ const ManageAgents = () => {
         <div className="flex items-center gap-2.5">
           <img src={row.avatar} alt="avatar" className="w-8 h-8 rounded-full object-cover border" />
           <div>
-            <span className="font-semibold text-slate-800 dark:text-slate-200 block">{val}</span>
+            <span className="font-semibold text-slate-800 block">{val}</span>
             <span className="text-[9px] text-slate-400 font-mono">{row.email}</span>
           </div>
         </div>
@@ -136,9 +136,7 @@ const ManageAgents = () => {
       key: 'workload',
       label: 'Workload',
       render: (val) => (
-        <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${
-          val > 2 ? 'bg-red-50 text-red-700' : 'bg-slate-50 text-slate-700'
-        }`}>
+        <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${ val > 2 ? 'bg-red-50 text-red-700' : 'bg-slate-50 text-slate-700' }`}>
           {val} active jobs
         </span>
       ),
@@ -149,11 +147,7 @@ const ManageAgents = () => {
       render: (val, row) => (
         <button
           onClick={() => handleToggleStatus(row)}
-          className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold border transition-colors ${
-            val === 'active'
-              ? 'bg-success-50 text-success-700 border-success-200'
-              : 'bg-slate-50 text-slate-500 border-slate-200'
-          }`}
+          className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold border transition-colors ${ val === 'active' ? 'bg-success-50 text-success-700 border-success-200' : 'bg-slate-50 text-slate-500 border-slate-200' }`}
         >
           {val === 'active' ? <FiToggleRight className="h-4 w-4 text-success-600" /> : <FiToggleLeft className="h-4 w-4 text-slate-400" />}
           {val.toUpperCase()}
@@ -180,11 +174,11 @@ const ManageAgents = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-909 dark:text-white flex items-center gap-2">
-            <FiTruck className="text-brand-655" />
+          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <FiTruck className="text-brand-600" />
             Manage Delivery Agents
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Dispatch, control shift statuses, and edit courier license manifest profiles.
           </p>
         </div>
@@ -193,7 +187,7 @@ const ManageAgents = () => {
         </Button>
       </div>
 
-      <div className="bg-white dark:bg-slate-805 p-4 rounded-xl border border-slate-205 dark:border-slate-750 shadow-subtle">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-subtle">
         <SearchBar value={search} onChange={setSearch} onClear={() => setSearch('')} placeholder="Search by name, email, or vehicle..." />
       </div>
 
@@ -219,7 +213,7 @@ const ManageAgents = () => {
             label="Email Address"
             name="email"
             type="email"
-            placeholder="e.g. john@swiftroute.com"
+            placeholder="e.g. john@logitrack.com"
             error={errors.email}
             required
             readOnly={!!selectedAgent}
@@ -229,7 +223,7 @@ const ManageAgents = () => {
           <Input
             label="Phone Number"
             name="phone"
-            placeholder="+1 (555) 012-3456"
+            placeholder="+91 98765 43210"
             error={errors.phone}
             required
             {...register('phone', { required: 'Phone is required' })}
@@ -264,7 +258,7 @@ const ManageAgents = () => {
             {...register('license', { required: 'License is required' })}
           />
 
-          <div className="flex justify-end gap-3 pt-4 border-t dark:border-slate-750">
+          <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={() => setShowFormModal(false)} disabled={modalLoading}>
               Cancel
             </Button>

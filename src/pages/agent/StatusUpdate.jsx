@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
 import { ORDER_STATUS } from '../../constants';
+import { formatCurrency } from '../../utils';
 import Select from '../../components/Select';
 import Textarea from '../../components/Textarea';
 import Button from '../../components/Button';
@@ -81,34 +82,34 @@ const StatusUpdate = () => {
       <div className="flex items-center justify-between">
         <Link
           to="/agent"
-          className="inline-flex items-center text-xs font-semibold text-slate-555 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-205"
+          className="inline-flex items-center text-xs font-semibold text-slate-500 hover:text-slate-700"
         >
           <FiArrowLeft className="mr-1.5" /> Back to Dashboard
         </Link>
         <span className="text-xs font-bold text-slate-400">Order ID: {order.id}</span>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card space-y-6">
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-card space-y-6">
         <div>
-          <h1 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <FiTruck className="text-brand-505" />
-            Update Shipping Telemetry
+          <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <FiTruck className="text-brand-500" />
+            Update Delivery Status
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Specify the next logistics stage and upload safety proof flags.
+          <p className="text-xs text-slate-500 mt-1">
+            Specify the next logistics stage and upload safety proof documents.
           </p>
         </div>
 
         {/* Parcel details header */}
-        <div className="p-4 bg-slate-50 dark:bg-slate-750 rounded-xl border border-slate-200 dark:border-slate-700 text-xs space-y-2">
+        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
           <div className="flex justify-between font-medium">
             <span className="text-slate-500">Destination drop:</span>
-            <span className="text-slate-850 dark:text-slate-200">{order.dropAddress}</span>
+            <span className="text-slate-800">{order.dropAddress}</span>
           </div>
           <div className="flex justify-between font-medium">
             <span className="text-slate-500">Billing details:</span>
-            <span className="text-slate-855 dark:text-slate-200 font-semibold text-brand-655 dark:text-brand-400">
-              {order.paymentType} {order.paymentType === 'COD' ? `(${order.price} USD)` : ''}
+            <span className="text-slate-800 font-semibold text-brand-600">
+              {order.paymentType} {order.paymentType === 'COD' ? `(${formatCurrency(order.price)})` : ''}
             </span>
           </div>
         </div>
@@ -124,7 +125,7 @@ const StatusUpdate = () => {
 
           {/* Conditional rendering for Delivered Status: OTP Verification */}
           {status === ORDER_STATUS.DELIVERED && (
-            <div className="border border-success-200 dark:border-success-900/40 bg-success-50/10 dark:bg-success-950/5 p-4 rounded-xl space-y-4 animate-fadeIn">
+            <div className="border border-success-200 bg-success-50/10 p-4 rounded-xl space-y-4 animate-fadeIn">
               <OtpVerification
                 expectedOtp="1234"
                 loading={isSubmitting}
@@ -135,13 +136,13 @@ const StatusUpdate = () => {
 
           {/* Conditional rendering for Failed Status: Reason text + Image proof upload */}
           {status === ORDER_STATUS.FAILED && (
-            <div className="border border-red-200 dark:border-red-900/30 bg-red-50/10 dark:bg-red-950/5 p-5 rounded-xl space-y-4 animate-fadeIn">
-              <div className="flex items-start gap-2 text-xs text-red-750 dark:text-red-400 mb-2">
+            <div className="border border-red-200 bg-red-50/10 p-5 rounded-xl space-y-4 animate-fadeIn">
+              <div className="flex items-start gap-2 text-xs text-red-750 mb-2">
                 <FiAlertTriangle className="h-5 w-5 mt-0.5" />
                 <div>
                   <p className="font-bold">Failed Delivery Manifest</p>
                   <p className="mt-0.5 leading-relaxed text-slate-500">
-                    To register a delivery failure in telemetry, specify a reasoning description and upload photographic proof.
+                    To register a delivery failure in the tracking logs, specify a reasoning description and upload photographic proof.
                   </p>
                 </div>
               </div>
@@ -155,10 +156,10 @@ const StatusUpdate = () => {
               />
 
               <div>
-                <span className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                <span className="block text-xs font-semibold text-slate-700 mb-2">
                   Take/Upload Proof Photo
                 </span>
-                <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-750/30 transition-all text-slate-400">
+                <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-xl p-5 cursor-pointer hover:bg-slate-50 transition-all text-slate-400">
                   {image ? (
                     <img src={image} alt="Proof base64" className="h-28 object-cover rounded-lg border" />
                   ) : (
@@ -175,7 +176,7 @@ const StatusUpdate = () => {
 
           {/* Standard Statuses (Transit/Picked Up/Out for delivery) Submission button */}
           {status !== ORDER_STATUS.DELIVERED && (
-            <div className="pt-4 flex items-center justify-end gap-3 border-t dark:border-slate-750">
+            <div className="pt-4 flex items-center justify-end gap-3 border-t">
               <Link to="/agent">
                 <Button variant="outline">Cancel</Button>
               </Link>
@@ -185,7 +186,7 @@ const StatusUpdate = () => {
                 loading={isSubmitting}
                 disabled={status === ORDER_STATUS.FAILED && !notes.trim()}
               >
-                Update Telemetry
+                Update Delivery Status
               </Button>
             </div>
           )}

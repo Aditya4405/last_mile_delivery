@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
 import Input from '../../components/Input';
+import Select from '../../components/Select';
 import Button from '../../components/Button';
 import toast from 'react-hot-toast';
 import { FiUser, FiLock, FiSettings, FiBell, FiCamera } from 'react-icons/fi';
 
 const Settings = () => {
   const { user, updateProfile, changePassword } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
   
   const [uploading, setUploading] = useState(false);
   const [updatingProfile, setUpdatingProfile] = useState(false);
@@ -26,6 +25,7 @@ const Settings = () => {
       phone: user?.phone || '',
       address: user?.address || '',
       zip: user?.zip || '',
+      gstNumber: user?.gstNumber || '',
     },
   });
 
@@ -47,7 +47,7 @@ const Settings = () => {
     try {
       await updateProfile(data);
     } catch (err) {
-      toast.error('Failed to update details.');
+      toast.error('Failed to update profile details.');
     } finally {
       setUpdatingProfile(false);
     }
@@ -59,7 +59,7 @@ const Settings = () => {
       await changePassword(data.oldPassword, data.newPassword);
       resetPass();
     } catch (err) {
-      toast.error(err.message || 'Passcode change failed.');
+      toast.error(err.message || 'Passcode update failed.');
     } finally {
       setUpdatingPassword(false);
     }
@@ -76,7 +76,7 @@ const Settings = () => {
         await updateProfile({ avatar: reader.result });
         toast.success('Avatar updated successfully!');
       } catch (err) {
-        toast.error('Failed to upload image avatar.');
+        toast.error('Failed to upload avatar.');
       } finally {
         setUploading(false);
       }
@@ -85,28 +85,28 @@ const Settings = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto px-4 md:px-0">
       <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-          <FiSettings className="text-brand-650" />
-          Profile Settings
+        <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <FiSettings className="text-blue-600 shrink-0" />
+          Settings
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-405 mt-1">
-          Configure security credentials, notifications, and profile details.
+        <p className="text-xs text-slate-500 mt-1">
+          Configure safety parameters, notifications, language choices, and profile details.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Left avatar upload */}
+        {/* Left avatar upload & preferences */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card flex flex-col items-center text-center">
+          <div className="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-card flex flex-col items-center text-center">
             <div className="relative">
               <img
                 src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
                 alt="Profile Avatar"
                 className="h-28 w-28 rounded-full border-4 border-slate-100 object-cover shadow-subtle"
               />
-              <label className="absolute bottom-0 right-0 p-2 bg-brand-600 hover:bg-brand-700 text-white rounded-full cursor-pointer shadow-md transition-colors">
+              <label className="absolute bottom-0 right-0 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full cursor-pointer shadow-md transition-colors">
                 <FiCamera className="h-4 w-4" />
                 <input
                   type="file"
@@ -118,52 +118,42 @@ const Settings = () => {
               </label>
             </div>
             
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white mt-4">
+            <h3 className="text-sm font-bold text-slate-900 mt-4">
               {user?.name}
             </h3>
-            <p className="text-xxs text-slate-500 dark:text-slate-400 capitalize bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded mt-1.5 font-bold">
+            <p className="text-xxs text-slate-500 capitalize bg-slate-100 px-2 py-0.5 rounded mt-1.5 font-bold">
               {user?.role} Account
             </p>
           </div>
 
           {/* Preferences Card */}
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card space-y-4">
-            <h3 className="text-xs font-bold text-slate-850 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-              <FiBell className="text-brand-500" />
+          <div className="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-card space-y-5">
+            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <FiBell className="text-blue-600 shrink-0" />
               General Preferences
             </h3>
 
             <div className="space-y-4 text-xs">
-              <div className="flex items-center justify-between">
+              <label className="flex items-start gap-2.5 cursor-pointer text-slate-600">
+                <input type="checkbox" defaultChecked className="rounded text-blue-600 mr-1 mt-0.5" />
                 <div>
-                  <p className="font-bold text-slate-750 dark:text-slate-250">Toggle Dark Mode</p>
-                  <p className="text-[10px] text-slate-500">Enable modern logistics dark theme</p>
-                </div>
-                <button
-                  onClick={toggleTheme}
-                  className={`
-                    w-11 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-350
-                    ${isDark ? 'bg-brand-655' : 'bg-slate-300'}
-                  `}
-                >
-                  <div
-                    className={`
-                      bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-transform duration-350
-                      ${isDark ? 'translate-x-5' : 'translate-x-0'}
-                    `}
-                  />
-                </button>
-              </div>
-
-              <hr className="border-slate-100 dark:border-slate-750" />
-
-              <label className="flex items-start gap-2.5 cursor-pointer text-slate-600 dark:text-slate-350">
-                <input type="checkbox" defaultChecked className="rounded text-brand-600 mr-1 mt-0.5" />
-                <div>
-                  <p className="font-semibold text-slate-750 dark:text-slate-250">Email Telemetry Signals</p>
-                  <p className="text-[10px] text-slate-450 mt-0.5">Receive updates on dispatch and pickup SLA events.</p>
+                  <p className="font-semibold text-slate-800">Email Tracking Alerts</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">Receive email notifications on shipment pickup and dispatch events.</p>
                 </div>
               </label>
+
+              <hr className="border-slate-100" />
+
+              <div className="space-y-1.5">
+                <label className="block font-bold text-slate-800">Language Preference</label>
+                <select className="w-full text-xs rounded-lg border border-slate-300 bg-white text-slate-900 p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                  <option value="en">English (default)</option>
+                  <option value="hi">हिन्दी (Hindi)</option>
+                  <option value="mr">मराठी (Marathi)</option>
+                  <option value="ta">தமிழ் (Tamil)</option>
+                  <option value="te">తెలుగు (Telugu)</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -171,9 +161,9 @@ const Settings = () => {
         {/* Profile edit & passwords fields */}
         <div className="md:col-span-2 space-y-6">
           {/* Details edit */}
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card space-y-5">
-            <h3 className="text-xs font-bold text-slate-850 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5 border-b pb-3">
-              <FiUser className="text-brand-500" />
+          <div className="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-card space-y-5">
+            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5 border-b pb-3">
+              <FiUser className="text-blue-600 shrink-0" />
               Edit Personal Info
             </h3>
 
@@ -189,25 +179,37 @@ const Settings = () => {
                 <Input
                   label="Phone Number"
                   name="phone"
+                  placeholder="+91 XXXXX XXXXX"
                   error={errorsProfile.phone}
                   required
                   {...regProfile('phone', { required: 'Phone is required' })}
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Input
-                  label="Pickup/Drop Base Address"
+                  label="Preferred Pickup/Drop Address"
                   name="address"
-                  className="col-span-2"
+                  className="sm:col-span-2"
                   error={errorsProfile.address}
                   {...regProfile('address')}
                 />
                 <Input
-                  label="Zip Code"
+                  label="Pincode"
                   name="zip"
+                  placeholder="e.g. 110001"
                   error={errorsProfile.zip}
                   {...regProfile('zip')}
+                />
+              </div>
+
+              <div className="grid grid-cols-1">
+                <Input
+                  label="GST Number (Optional)"
+                  name="gstNumber"
+                  placeholder="e.g. 07AAAAA1111A1Z1"
+                  error={errorsProfile.gstNumber}
+                  {...regProfile('gstNumber')}
                 />
               </div>
 
@@ -218,10 +220,10 @@ const Settings = () => {
           </div>
 
           {/* Passwords change */}
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card space-y-5">
-            <h3 className="text-xs font-bold text-slate-850 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5 border-b pb-3">
-              <FiLock className="text-brand-500" />
-              Change Passcode Credentials
+          <div className="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-card space-y-5">
+            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5 border-b pb-3">
+              <FiLock className="text-blue-600 shrink-0" />
+              Change Password Credentials
             </h3>
 
             <form onSubmit={handlePassSubmit(onChangePassword)} className="space-y-4">

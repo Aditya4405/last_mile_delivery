@@ -101,7 +101,7 @@ const ManageRateCards = () => {
   };
 
   const columns = [
-    { key: 'type', label: 'Client Type', render: (val) => <span className="font-bold text-slate-800 dark:text-slate-100">{val}</span> },
+    { key: 'type', label: 'Client Type', render: (val) => <span className="font-bold text-slate-800">{val}</span> },
     { key: 'scope', label: 'Transit Scope', render: (val) => <span className="font-semibold text-slate-550">{val}</span> },
     { key: 'baseWeight', label: 'Base Weight (kg)' },
     { key: 'basePrice', label: 'Base Price', render: (val) => formatCurrency(val) },
@@ -127,11 +127,11 @@ const ManageRateCards = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-909 dark:text-white flex items-center gap-2">
-            <FiDollarSign className="text-brand-655" />
+          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <FiDollarSign className="text-brand-600" />
             Manage Rate Cards
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Edit shipping tariffs, weight slabs, and cash handling fees.
           </p>
         </div>
@@ -212,7 +212,7 @@ const ManageRateCards = () => {
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t dark:border-slate-750">
+          <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={() => setShowFormModal(false)} disabled={modalLoading}>
               Cancel
             </Button>

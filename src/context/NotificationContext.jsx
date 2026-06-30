@@ -57,8 +57,8 @@ export const NotificationProvider = ({ children }) => {
     toast(
       (t) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-slate-800 dark:text-slate-100">{title}</span>
-          <span className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">{message}</span>
+          <span className="font-semibold text-slate-800">{title}</span>
+          <span className="text-xs text-slate-600 mt-0.5">{message}</span>
         </div>
       ),
       {

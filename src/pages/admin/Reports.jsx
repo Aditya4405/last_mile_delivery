@@ -54,11 +54,11 @@ const Reports = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-909 dark:text-white flex items-center gap-2">
-            <FiPieChart className="text-brand-655" />
+          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <FiPieChart className="text-brand-600" />
             Operations Analytics Reports
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Generate and export system-wide logistics telemetry summaries.
           </p>
         </div>
@@ -69,7 +69,7 @@ const Reports = () => {
       </div>
 
       {/* Select Report Panel */}
-      <div className="bg-white dark:bg-slate-805 p-4 rounded-xl border border-slate-205 dark:border-slate-750 shadow-subtle flex flex-col sm:flex-row sm:items-center gap-4">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-subtle flex flex-col sm:flex-row sm:items-center gap-4">
         <span className="text-xs font-bold text-slate-550 shrink-0">Select Analysis Template:</span>
         <Select
           value={reportType}
@@ -119,8 +119,8 @@ const Reports = () => {
       )}
 
       {/* Analytics Chart Container */}
-      <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card">
-        <h3 className="text-xs font-bold text-slate-855 dark:text-slate-200 uppercase tracking-wider mb-6">
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-card">
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-6">
           Visualization: {reportType.toUpperCase()} DATA ANALYSIS
         </h3>
         

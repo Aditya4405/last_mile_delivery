@@ -105,12 +105,12 @@ const ManageAreas = () => {
 
   const columns = [
     { key: 'name', label: 'Area Name', sortable: true },
-    { key: 'zip', label: 'ZIP / Postal Code', sortable: true, render: (val) => <span className="font-mono font-semibold">{val}</span> },
+    { key: 'zip', label: 'Pincode', sortable: true, render: (val) => <span className="font-mono font-semibold">{val}</span> },
     {
       key: 'zoneName',
       label: 'Parent Routing Zone',
       sortable: true,
-      render: (val) => <span className="font-bold text-slate-700 dark:text-slate-200">{val}</span>,
+      render: (val) => <span className="font-bold text-slate-700">{val}</span>,
     },
     {
       key: 'actions',
@@ -132,11 +132,11 @@ const ManageAreas = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-909 dark:text-white flex items-center gap-2">
-            <FiMapPin className="text-brand-655" />
+          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <FiMapPin className="text-brand-600" />
             Manage Areas
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Configure delivery pin codes and associate subdivisions to operational zones.
           </p>
         </div>
@@ -145,8 +145,8 @@ const ManageAreas = () => {
         </Button>
       </div>
 
-      <div className="bg-white dark:bg-slate-850 p-4 rounded-xl border border-slate-200 dark:border-slate-750 shadow-subtle">
-        <SearchBar value={search} onChange={setSearch} onClear={() => setSearch('')} placeholder="Search by area name or zip code..." />
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-subtle">
+        <SearchBar value={search} onChange={setSearch} onClear={() => setSearch('')} placeholder="Search by area name or pincode..." />
       </div>
 
       <Table columns={columns} data={areas} loading={loading} emptyMessage="No area subdivisions configured." />
@@ -165,12 +165,12 @@ const ManageAreas = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="ZIP / Postal Code"
+              label="Pincode"
               name="zip"
               placeholder="e.g. 110016"
               error={errors.zip}
               required
-              {...register('zip', { required: 'ZIP code is required' })}
+              {...register('zip', { required: 'Pincode is required' })}
             />
             <Select
               label="Associated Zone"
@@ -183,7 +183,7 @@ const ManageAreas = () => {
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t dark:border-slate-750">
+          <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={() => setShowFormModal(false)} disabled={modalLoading}>
               Cancel
             </Button>

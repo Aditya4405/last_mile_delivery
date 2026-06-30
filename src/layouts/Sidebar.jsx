@@ -29,7 +29,7 @@ const Sidebar = ({ isOpen, onClose, menuItems = [] }) => {
           <div className="flex items-center gap-2">
             <FiTrendingUp className="h-6 w-6 text-brand-400" />
             <span className="text-lg font-black tracking-tight text-white">
-              SwiftRoute
+              LogiTrack
             </span>
           </div>
           <button
@@ -41,7 +41,7 @@ const Sidebar = ({ isOpen, onClose, menuItems = [] }) => {
         </div>
 
         {/* User Card */}
-        <div className="px-6 py-4.5 border-b border-slate-805 flex items-center gap-3">
+        <div className="px-6 py-4.5 border-b border-slate-800 flex items-center gap-3">
           <img
             src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100'}
             alt="Profile Avatar"
@@ -67,7 +67,7 @@ const Sidebar = ({ isOpen, onClose, menuItems = [] }) => {
                 flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
                 ${isActive
                   ? 'bg-brand-600 text-white shadow-md shadow-brand-900/30'
-                  : 'text-slate-405 hover:bg-slate-800/60 hover:text-white'
+                  : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'
                 }
               `}
             >

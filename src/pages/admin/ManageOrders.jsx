@@ -143,7 +143,7 @@ const ManageOrders = () => {
           checked={selectedIds.includes(row.id)}
           onChange={() => handleToggleSelectRow(row.id)}
           onClick={(e) => e.stopPropagation()} // prevent row-click detail navigation
-          className="rounded border-slate-300 text-brand-605 focus:ring-brand-500 h-4 w-4"
+          className="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4"
         />
       ),
     },
@@ -151,7 +151,7 @@ const ManageOrders = () => {
       key: 'id',
       label: 'Order ID',
       sortable: true,
-      render: (val) => <span className="font-bold text-brand-655">{val}</span>,
+      render: (val) => <span className="font-bold text-brand-600">{val}</span>,
     },
     { key: 'customerName', label: 'Customer', sortable: true },
     { key: 'dropAddress', label: 'Destination', render: (val) => <span className="truncate max-w-[150px] block">{val}</span> },
@@ -194,11 +194,11 @@ const ManageOrders = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-909 dark:text-white flex items-center gap-2">
-            <FiPackage className="text-brand-655" />
+          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <FiPackage className="text-brand-600" />
             Manage Shipping Orders
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Dispatch agents, monitor status timelines, and cancel manifest codes.
           </p>
         </div>
@@ -215,7 +215,7 @@ const ManageOrders = () => {
       </div>
 
       {/* Filter Matrix Panel */}
-      <div className="bg-white dark:bg-slate-805 p-5 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card space-y-4">
+      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-card space-y-4">
         <SearchBar
           value={search}
           onChange={setSearch}

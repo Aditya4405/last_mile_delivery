@@ -71,11 +71,11 @@ const HelpCenter = () => {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+        <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
           <FiHelpCircle className="text-brand-650" />
           Help Desk & FAQs
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Resolve shipment issues, consult weight matrices, or raise support tickets.
         </p>
       </div>
@@ -83,24 +83,24 @@ const HelpCenter = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* FAQs Accordion */}
         <div className="space-y-4">
-          <h3 className="text-sm font-bold text-slate-905 dark:text-white">Frequently Asked Questions</h3>
+          <h3 className="text-sm font-bold text-slate-900">Frequently Asked Questions</h3>
           <div className="space-y-2.5">
             {faqs.map((faq, idx) => {
               const isOpen = openFaqIndex === idx;
               return (
                 <div
                   key={idx}
-                  className="bg-white dark:bg-slate-800 rounded-xl border border-slate-205 dark:border-slate-750 shadow-subtle overflow-hidden"
+                  className="bg-white rounded-xl border border-slate-200 shadow-subtle overflow-hidden"
                 >
                   <button
                     onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                    className="w-full flex items-center justify-between p-4 text-xs font-bold text-left text-slate-800 dark:text-slate-100 focus:outline-none"
+                    className="w-full flex items-center justify-between p-4 text-xs font-bold text-left text-slate-800 focus:outline-none"
                   >
                     <span>{faq.q}</span>
                     <FiChevronDown className={`h-4.5 w-4.5 transform transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isOpen && (
-                    <div className="px-4 pb-4 text-xs text-slate-500 dark:text-slate-405 leading-relaxed">
+                    <div className="px-4 pb-4 text-xs text-slate-500 leading-relaxed">
                       {faq.a}
                     </div>
                   )}
@@ -111,8 +111,8 @@ const HelpCenter = () => {
         </div>
 
         {/* Raise Ticket Form */}
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card space-y-4">
-          <h3 className="text-sm font-bold text-slate-905 dark:text-white flex items-center gap-1.5">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-card space-y-4">
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
             <FiMessageSquare className="text-brand-500" />
             Raise Support Ticket
           </h3>
@@ -153,16 +153,16 @@ const HelpCenter = () => {
       </div>
 
       {/* Raised Tickets List */}
-      <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-205 dark:border-slate-750 shadow-card space-y-4">
-        <h3 className="text-sm font-bold text-slate-905 dark:text-white">Active Support Tickets</h3>
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-card space-y-4">
+        <h3 className="text-sm font-bold text-slate-900">Active Support Tickets</h3>
         {loadingTickets ? (
           <div className="animate-pulse space-y-2 h-20 bg-slate-100 rounded-lg" />
         ) : tickets.length === 0 ? (
-          <p className="text-xs text-slate-500 dark:text-slate-400 py-4 text-center">No tickets raised yet.</p>
+          <p className="text-xs text-slate-500 py-4 text-center">No tickets raised yet.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-xs">
-              <thead className="bg-slate-50 dark:bg-slate-805">
+            <table className="min-w-full divide-y divide-slate-200 text-xs">
+              <thead className="bg-slate-50">
                 <tr className="text-left font-bold text-slate-500">
                   <th className="p-3">Ticket ID</th>
                   <th className="p-3">Subject</th>
@@ -171,17 +171,15 @@ const HelpCenter = () => {
                   <th className="p-3">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-750">
+              <tbody className="divide-y divide-slate-100">
                 {tickets.map((t) => (
-                  <tr key={t.id} className="text-slate-700 dark:text-slate-250">
-                    <td className="p-3 font-bold text-brand-605">{t.id}</td>
+                  <tr key={t.id} className="text-slate-700">
+                    <td className="p-3 font-bold text-brand-600">{t.id}</td>
                     <td className="p-3 font-medium">{t.subject}</td>
                     <td className="p-3 font-mono">{t.orderId}</td>
                     <td className="p-3">{formatDate(t.createdAt, 'DD MMM YYYY')}</td>
                     <td className="p-3">
-                      <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${
-                        t.status === 'Open' ? 'bg-amber-50 text-amber-705 border border-amber-200' : 'bg-slate-50 text-slate-505 border border-slate-200'
-                      }`}>
+                      <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${ t.status === 'Open' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-slate-50 text-slate-505 border border-slate-200' }`}>
                         {t.status}
                       </span>
                     </td>
