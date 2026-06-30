@@ -16,18 +16,18 @@ const ConfirmationModal = ({
 }) => {
   const colors = {
     danger: {
-      iconBg: 'bg-red-50 dark:bg-red-950/20',
-      iconText: 'text-red-650 dark:text-red-400',
+      iconBg: 'bg-red-50 ',
+      iconText: 'text-red-650 ',
       btnVariant: 'danger',
     },
     warning: {
-      iconBg: 'bg-amber-50 dark:bg-amber-950/20',
-      iconText: 'text-amber-650 dark:text-amber-400',
+      iconBg: 'bg-amber-50 ',
+      iconText: 'text-amber-650 ',
       btnVariant: 'primary', // standard alert
     },
     primary: {
-      iconBg: 'bg-brand-50 dark:bg-brand-950/20',
-      iconText: 'text-brand-650 dark:text-brand-400',
+      iconBg: 'bg-brand-50 ',
+      iconText: 'text-brand-650 ',
       btnVariant: 'primary',
     },
   };
@@ -40,7 +40,7 @@ const ConfirmationModal = ({
         <div className={`p-3 rounded-full ${selectedColor.iconBg} ${selectedColor.iconText} mb-4`}>
           <FiAlertTriangle className="h-6 w-6" />
         </div>
-        <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+        <p className="text-sm text-slate-600 leading-relaxed mb-6">
           {message}
         </p>
         <div className="flex items-center justify-end w-full gap-3">

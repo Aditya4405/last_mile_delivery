@@ -9,12 +9,12 @@ export const Badge = ({
   className = '',
 }) => {
   const styles = {
-    primary: 'bg-brand-50 dark:bg-brand-950/20 text-brand-700 dark:text-brand-400 border border-brand-200 dark:border-brand-900/50',
-    success: 'bg-success-50 dark:bg-success-950/20 text-success-700 dark:text-success-400 border border-success-200 dark:border-success-900/50',
-    danger: 'bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-205 dark:border-red-900/50',
-    warning: 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-205 dark:border-amber-900/50',
-    info: 'bg-primary-50 dark:bg-primary-950/20 text-primary-700 dark:text-primary-400 border border-primary-205 dark:border-primary-900/50',
-    slate: 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700',
+    primary: 'bg-brand-50  text-brand-700  border border-brand-200 ',
+    success: 'bg-success-50  text-success-700  border border-success-200 ',
+    danger: 'bg-red-50  text-red-700  border border-red-205 ',
+    warning: 'bg-amber-50  text-amber-700  border border-amber-205 ',
+    info: 'bg-primary-50  text-primary-700  border border-primary-205 ',
+    slate: 'bg-slate-50  text-slate-700  border border-slate-200 ',
   };
 
   return (

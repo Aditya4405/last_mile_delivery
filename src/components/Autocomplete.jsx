@@ -59,7 +59,7 @@ const Autocomplete = ({
   return (
     <div className={`relative w-full ${className}`} ref={containerRef}>
       {label && (
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-350 mb-1.5">
+        <label className="block text-sm font-medium text-slate-700 mb-1.5">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -74,14 +74,7 @@ const Autocomplete = ({
           }}
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder}
-          className={`
-            block w-full rounded-lg border text-sm transition-all focus:outline-none focus:ring-2
-            pl-3.5 pr-10 py-2.5 bg-white dark:bg-slate-800
-            ${error 
-              ? 'border-red-300 dark:border-red-900/50 text-red-900 dark:text-red-300 placeholder-red-350 focus:ring-red-500 focus:border-red-500 bg-red-50/30' 
-              : 'border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-brand-500 focus:border-brand-500'
-            }
-          `}
+          className={`block w-full rounded-lg border text-sm transition-all focus:outline-none focus:ring-2 pl-3.5 pr-10 py-2.5 bg-white ${error ? 'border-red-300 text-red-900 placeholder-red-350 focus:ring-red-500 focus:border-red-500 bg-red-50/30' : 'border-slate-300 text-slate-900 focus:ring-brand-500 focus:border-brand-500' }`}
         />
 
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 gap-1 text-slate-400">
@@ -89,7 +82,7 @@ const Autocomplete = ({
             <button
               type="button"
               onClick={handleClear}
-              className="p-1 hover:text-slate-600 dark:hover:text-slate-200"
+              className="p-1 hover:text-slate-600"
             >
               <FiX className="h-4 w-4" />
             </button>
@@ -97,7 +90,7 @@ const Autocomplete = ({
           <button
             type="button"
             onClick={() => setIsOpen((prev) => !prev)}
-            className="p-1 hover:text-slate-600 dark:hover:text-slate-200"
+            className="p-1 hover:text-slate-600"
           >
             <FiChevronDown className={`h-4 w-4 transform transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </button>
@@ -105,22 +98,19 @@ const Autocomplete = ({
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-750 bg-white dark:bg-slate-800 shadow-premium">
+        <div className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-premium">
           {filteredOptions.length > 0 ? (
             filteredOptions.map((opt) => (
               <div
                 key={opt.value}
                 onClick={() => handleSelect(opt)}
-                className={`
-                  px-3.5 py-2 text-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors
-                  ${value === opt.value ? 'bg-brand-50 dark:bg-brand-950/20 text-brand-700 dark:text-brand-400 font-medium' : 'text-slate-700 dark:text-slate-200'}
-                `}
+                className={`px-3.5 py-2 text-sm cursor-pointer hover:bg-slate-100 transition-colors ${value === opt.value ? 'bg-brand-50 text-brand-700 font-medium' : 'text-slate-700 '}`}
               >
                 {opt.label}
               </div>
             ))
           ) : (
-            <div className="px-3.5 py-2.5 text-sm text-slate-500 dark:text-slate-400 text-center">
+            <div className="px-3.5 py-2.5 text-sm text-slate-500 text-center">
               No options found
             </div>
           )}
@@ -128,7 +118,7 @@ const Autocomplete = ({
       )}
 
       {error && (
-        <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">
+        <p className="mt-1.5 text-xs text-red-600">
           {error.message || error}
         </p>
       )}

@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 // Context Providers
-import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 
@@ -60,11 +59,10 @@ const NotificationsCenter = lazy(() => import('./pages/common/NotificationsCente
 
 const App = () => {
   return (
-    <ThemeProvider>
       <AuthProvider>
         <NotificationProvider>
           <BrowserRouter>
-            <Suspense fallback={<Loader message="Initializing SwiftRoute System Telemetry..." />}>
+            <Suspense fallback={<Loader message="Initializing LogiTrack Logistics Control Center..." />}>
               <Routes>
                 {/* Public Auth Routes */}
                 <Route element={<PublicLayout />}>
@@ -126,7 +124,6 @@ const App = () => {
           </BrowserRouter>
         </NotificationProvider>
       </AuthProvider>
-    </ThemeProvider>
   );
 };
 
