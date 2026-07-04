@@ -17,12 +17,12 @@ LogiTrack is a production-grade, end-to-end Last Mile Logistics Tracking System.
 
 ### Prerequisites
 * **Java Development Kit (JDK)**: Version 21
-* **Database**: PostgreSQL (version 14+)
+* **Database**: MySQL / TiDB (version 8.0+)
 * **Build System**: Maven (wrapper included)
 * **Frontend Runtime**: Node.js (version 18+) & npm
 
 ### Backend Configuration & Start
-1. Ensure your local PostgreSQL instance is running and a database named `lastmile_tracker` exists:
+1. Ensure your local MySQL/TiDB instance is running and a database named `lastmile_tracker` exists:
    ```sql
    CREATE DATABASE lastmile_tracker;
    ```
@@ -68,9 +68,9 @@ A `.env.example` file is included in the project root. To customize your product
 | Environment Variable | Description | Default Fallback Value |
 | :--- | :--- | :--- |
 | `PORT` | Port number of the Spring Boot application | `8084` |
-| `DB_URL` | JDBC Connection URL to PostgreSQL | `jdbc:postgresql://localhost:5432/lastmile_tracker` |
-| `DB_USERNAME` | Username for database access | `postgres` |
-| `DB_PASSWORD` | Password for database access | `Aditya#4405` |
+| `DB_URL` | JDBC Connection URL to MySQL/TiDB | `jdbc:mysql://localhost:3306/lastmile_tracker?createDatabaseIfNotExist=true&useSSL=false` |
+| `DB_USERNAME` | Username for database access | `root` |
+| `DB_PASSWORD` | Password for database access | `` |
 | `JWT_SECRET` | 256-bit Hex signature key for JWT tokens | `9a4f2c5d8e1a3b7c6d...` |
 | `SMTP_HOST` | Host address of SMTP server | `smtp.gmail.com` |
 | `SMTP_PORT` | Port number of SMTP server | `587` |
@@ -110,7 +110,7 @@ LogiTrack exposes self-documenting REST APIs powered by **Springdoc OpenAPI (Swa
 
 ## 4. Database Schema & Architecture
 
-The database is built on PostgreSQL with strict relational constraints, indexed fields for quick query resolutions, and automatic auditing triggers.
+The database is built on MySQL/TiDB with strict relational constraints, indexed fields for quick query resolutions, and automatic auditing triggers.
 
 ```mermaid
 erDiagram
