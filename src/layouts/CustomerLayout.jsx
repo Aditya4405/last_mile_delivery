@@ -6,7 +6,7 @@ import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
 import Footer from './Footer';
-import { FiGrid, FiPlusCircle, FiList, FiUser, FiHelpCircle, FiSettings } from 'react-icons/fi';
+import { FiGrid, FiPlusCircle, FiList, FiUser, FiHelpCircle, FiSettings, FiCreditCard } from 'react-icons/fi';
 
 const CustomerLayout = () => {
   const { user, isAuthenticated, loading } = useAuth();
@@ -27,6 +27,7 @@ const CustomerLayout = () => {
     { label: 'Overview Dashboard', path: '/customer', icon: FiGrid, end: true },
     { label: 'Create Delivery Order', path: '/customer/book', icon: FiPlusCircle },
     { label: 'My Order History', path: '/customer/orders', icon: FiList },
+    { label: 'Payments & Invoices', path: '/customer/payments', icon: FiCreditCard },
     { label: 'Profile Account', path: '/customer/profile', icon: FiUser },
     { label: 'Help Desk Center', path: '/customer/help', icon: FiHelpCircle },
     { label: 'Profile Settings', path: '/customer/settings', icon: FiSettings },

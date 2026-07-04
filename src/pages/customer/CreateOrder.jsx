@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { rateCardService } from '../../services/rateCardService';
 import { orderService } from '../../services/orderService';
 import { addressService } from '../../services/addressService';
+import { paymentService } from '../../services/paymentService';
 import { ZONES } from '../../constants';
 import { calculateVolumetricWeight, calculateBillableWeight, formatCurrency } from '../../utils';
 import Input from '../../components/Input';
@@ -231,6 +232,21 @@ const CreateOrder = () => {
     setCurrentStep((prev) => prev - 1);
   };
 
+  // Helper to load Razorpay checkout script dynamically
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
@@ -241,10 +257,70 @@ const CreateOrder = () => {
         price: calculations.totalPrice,
       };
 
-      const result = await orderService.createOrder(finalOrderData, user);
-      setCreatedOrderId(result.id);
-      toast.success('Consignment registered in LogiTrack system!');
-      setCurrentStep(4);
+      if (data.paymentType === 'Prepaid') {
+        const scriptLoaded = await loadRazorpayScript();
+        if (!scriptLoaded) {
+          toast.error('Failed to load Razorpay payment gateway checkout interface. Please check network connection.');
+          setIsSubmitting(false);
+          return;
+        }
+
+        toast.loading('Initializing online payment gateway order...', { id: 'rzp-init' });
+        try {
+          const rzpOrder = await paymentService.createPaymentOrder(finalOrderData);
+          toast.dismiss('rzp-init');
+
+          const options = {
+            key: rzpOrder.razorpayKey,
+            amount: rzpOrder.amount,
+            currency: rzpOrder.currency,
+            name: "LogiTrack Logistics",
+            description: "Payment for prepaid consignment booking",
+            order_id: rzpOrder.razorpayOrderId,
+            handler: async function (response) {
+              setIsSubmitting(true);
+              toast.loading('Verifying secure payment transaction...', { id: 'rzp-verify' });
+              try {
+                const verifiedOrder = await paymentService.verifyPaymentSignature({
+                  orderDetails: finalOrderData,
+                  razorpayOrderId: response.razorpay_order_id,
+                  razorpayPaymentId: response.razorpay_payment_id,
+                  razorpaySignature: response.razorpay_signature
+                });
+                toast.dismiss('rzp-verify');
+                toast.success('Online payment captured successfully!');
+                setCreatedOrderId(verifiedOrder.id);
+                setCurrentStep(4);
+              } catch (verifyErr) {
+                toast.dismiss('rzp-verify');
+                toast.error('Transaction verification failed. Please contact customer support.');
+              } finally {
+                setIsSubmitting(false);
+              }
+            },
+            prefill: {
+              name: user?.fullName || "",
+              email: user?.email || "",
+            },
+            theme: {
+              color: "#4f46e5", // Indigo theme
+            },
+          };
+
+          const paymentObject = new window.Razorpay(options);
+          paymentObject.open();
+
+        } catch (paymentInitErr) {
+          toast.dismiss('rzp-init');
+          toast.error('Failed to initialize payment gateway. Please try booking again.');
+        }
+      } else {
+        // COD order flow: Immediately create Order
+        const result = await orderService.createOrder(finalOrderData, user);
+        setCreatedOrderId(result.id);
+        toast.success('COD Consignment registered successfully in LogiTrack system!');
+        setCurrentStep(4);
+      }
     } catch (err) {
       toast.error(err.message || 'Failed to submit booking order.');
     } finally {

@@ -1,7 +1,9 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.logitrack-logistics.in/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+
+export const isLive = () => import.meta.env.VITE_APP_MODE === 'live';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -25,28 +27,38 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Response Interceptor: Handle errors, Refresh token mockup
+// Response Interceptor: Handle errors, Refresh token lookup
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Simulate 401 Unauthorized / Token Expiry
+    // Handle 401 Unauthorized / Token Expiry
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        // Simulated Token Refresh
         const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
         if (refreshToken) {
-          const mockNewToken = `mock-refreshed-jwt-token-${Date.now()}`;
-          localStorage.setItem('token', mockNewToken);
-          originalRequest.headers.Authorization = `Bearer ${mockNewToken}`;
+          let newToken = `mock-refreshed-jwt-token-${Date.now()}`;
+          if (isLive()) {
+            // Real refresh call on backend
+            const refreshRes = await axios.post(`${API_BASE_URL}/api/auth/refresh`, { refreshToken });
+            newToken = refreshRes.data.data.accessToken;
+          }
+          
+          const storageEngine = localStorage.getItem('token') ? localStorage : sessionStorage;
+          storageEngine.setItem('token', newToken);
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return axiosInstance(originalRequest);
         }
       } catch (refreshError) {
         // Clear auth and logout
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        localStorage.removeItem('refreshToken');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('refreshToken');
         window.location.href = '/login';
         toast.error('Session expired. Please log in again.');
         return Promise.reject(refreshError);

@@ -6,7 +6,7 @@ import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
 import Footer from './Footer';
-import { FiGrid, FiPackage, FiTruck, FiUsers, FiMap, FiMapPin, FiDollarSign, FiPieChart, FiSettings } from 'react-icons/fi';
+import { FiGrid, FiPackage, FiTruck, FiUsers, FiMap, FiMapPin, FiDollarSign, FiPieChart, FiSettings, FiCreditCard } from 'react-icons/fi';
 
 const AdminLayout = () => {
   const { user, isAuthenticated, loading } = useAuth();
@@ -31,6 +31,7 @@ const AdminLayout = () => {
     { label: 'Manage Zones', path: '/admin/zones', icon: FiMap },
     { label: 'Manage Areas', path: '/admin/areas', icon: FiMapPin },
     { label: 'Rate Cards', path: '/admin/rates', icon: FiDollarSign },
+    { label: 'Billing & Payments', path: '/admin/payments', icon: FiCreditCard },
     { label: 'Analytics Reports', path: '/admin/reports', icon: FiPieChart },
     { label: 'System Settings', path: '/admin/settings', icon: FiSettings },
   ];

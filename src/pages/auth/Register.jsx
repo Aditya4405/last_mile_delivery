@@ -3,7 +3,9 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiUser, FiMail, FiLock, FiPhone, FiMapPin, FiCompass } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
+import { ROLES } from '../../constants';
 import Input from '../../components/Input';
+import Select from '../../components/Select';
 import Button from '../../components/Button';
 import toast from 'react-hot-toast';
 
@@ -15,9 +17,11 @@ const Register = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
+      role: ROLES.CUSTOMER,
       name: '',
       email: '',
       password: '',
@@ -27,10 +31,20 @@ const Register = () => {
     },
   });
 
+  const selectedRole = watch('role', ROLES.CUSTOMER);
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      await signup(data.name, data.email, data.password, data.phone, data.address, data.zip);
+      await signup(
+        data.name, 
+        data.email, 
+        data.password, 
+        data.phone, 
+        data.address, 
+        data.zip,
+        data.role
+      );
       navigate('/login');
     } catch (err) {
       toast.error(err.message || 'Registration failed.');
@@ -39,18 +53,58 @@ const Register = () => {
     }
   };
 
+  // Dynamic header based on selected signup role
+  const getHeaderContent = () => {
+    switch (selectedRole) {
+      case ROLES.ADMIN:
+        return {
+          title: 'Create Administrator Account',
+          subtitle: 'Register to manage shipping logistics and fleet operations',
+        };
+      case ROLES.AGENT:
+        return {
+          title: 'Register as Delivery Partner',
+          subtitle: 'Join our delivery fleet and start managing dispatches',
+        };
+      case ROLES.CUSTOMER:
+      default:
+        return {
+          title: 'Create a Customer Account',
+          subtitle: 'Register to book packages and track orders',
+        };
+    }
+  };
+
+  const header = getHeaderContent();
+
+  const roleOptions = [
+    { value: ROLES.CUSTOMER, label: 'Customer (Ship & Track)' },
+    { value: ROLES.AGENT, label: 'Delivery Agent (Fleet)' },
+    { value: ROLES.ADMIN, label: 'Administrator' }
+  ];
+
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-bold text-slate-900">
-          Create a Customer Account
+        <h2 className="text-xl font-bold text-slate-900 transition-all duration-300">
+          {header.title}
         </h2>
-        <p className="text-xs text-slate-500 mt-1">
-          Register to book packages and track orders
+        <p className="text-xs text-slate-500 mt-1 transition-all duration-300">
+          {header.subtitle}
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        
+        <Select
+          label="Account Type (Role)"
+          name="role"
+          options={roleOptions}
+          error={errors.role}
+          required
+          {...register('role', { required: 'Account type is required' })}
+        />
+
         <Input
           label="Full Name"
           name="name"

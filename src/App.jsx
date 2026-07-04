@@ -24,6 +24,8 @@ const Login = lazy(() => import('./pages/auth/Login'));
 const Register = lazy(() => import('./pages/auth/Register'));
 const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
+const Landing = lazy(() => import('./pages/Landing'));
+
 
 // Customer Pages
 const CustomerDashboard = lazy(() => import('./pages/customer/CustomerDashboard'));
@@ -34,6 +36,7 @@ const LiveTracking = lazy(() => import('./pages/customer/LiveTracking'));
 const HelpCenter = lazy(() => import('./pages/customer/HelpCenter'));
 const CustomerSettings = lazy(() => import('./pages/customer/Settings'));
 const CustomerProfile = lazy(() => import('./pages/customer/Profile'));
+const CustomerPayments = lazy(() => import('./pages/customer/Payments'));
 
 // Agent Pages
 const AgentDashboard = lazy(() => import('./pages/agent/AgentDashboard'));
@@ -53,6 +56,7 @@ const ManageAreas = lazy(() => import('./pages/admin/ManageAreas'));
 const ManageRateCards = lazy(() => import('./pages/admin/ManageRateCards'));
 const Reports = lazy(() => import('./pages/admin/Reports'));
 const AdminSettings = lazy(() => import('./pages/admin/Settings'));
+const AdminPayments = lazy(() => import('./pages/admin/Payments'));
 
 // Shared Notifications Center
 const NotificationsCenter = lazy(() => import('./pages/common/NotificationsCenter'));
@@ -72,8 +76,8 @@ const App = () => {
                   <Route path="/reset-password" element={<ResetPassword />} />
                 </Route>
 
-                {/* Redirect Home to Login */}
-                <Route path="/" element={<Navigate to="/login" replace />} />
+                {/* Landing Page */}
+                <Route path="/" element={<Landing />} />
 
                 {/* Customer Dashboard Routes */}
                 <Route path="/customer" element={<CustomerLayout />}>
@@ -82,6 +86,7 @@ const App = () => {
                   <Route path="orders" element={<OrderHistory />} />
                   <Route path="orders/:id" element={<OrderDetails />} />
                   <Route path="orders/:id/track" element={<LiveTracking />} />
+                  <Route path="payments" element={<CustomerPayments />} />
                   <Route path="profile" element={<CustomerProfile />} />
                   <Route path="help" element={<HelpCenter />} />
                   <Route path="settings" element={<CustomerSettings />} />
@@ -108,6 +113,7 @@ const App = () => {
                   <Route path="zones" element={<ManageZones />} />
                   <Route path="areas" element={<ManageAreas />} />
                   <Route path="rates" element={<ManageRateCards />} />
+                  <Route path="payments" element={<AdminPayments />} />
                   <Route path="reports" element={<Reports />} />
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="notifications" element={<NotificationsCenter />} />

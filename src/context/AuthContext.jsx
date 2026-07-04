@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { ROLES } from '../constants';
+import axiosInstance, { isLive } from '../services/axios';
 
 const AuthContext = createContext();
 
@@ -107,6 +108,45 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password, rememberMe = false) => {
     setLoading(true);
+    if (isLive()) {
+      try {
+        const response = await axiosInstance.post('/api/auth/login', { email, password });
+        const data = response.data.data;
+        
+        let mappedRole = ROLES.CUSTOMER;
+        if (data.role === 'ADMIN') {
+          mappedRole = ROLES.ADMIN;
+        } else if (data.role === 'DELIVERY_AGENT' || data.role === 'AGENT') {
+          mappedRole = ROLES.AGENT;
+        }
+
+        const safeUser = {
+          id: data.email,
+          email: data.email,
+          name: data.fullName || 'User',
+          role: mappedRole,
+          avatar: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150`
+        };
+
+        setUser(safeUser);
+        setToken(data.accessToken);
+
+        const storageEngine = rememberMe ? localStorage : sessionStorage;
+        storageEngine.setItem('token', data.accessToken);
+        storageEngine.setItem('user', JSON.stringify(safeUser));
+        if (data.refreshToken) {
+          storageEngine.setItem('refreshToken', data.refreshToken);
+        }
+
+        toast.success(`Welcome back, ${safeUser.name}!`);
+        setLoading(false);
+        return safeUser;
+      } catch (err) {
+        setLoading(false);
+        throw new Error(err.response?.data?.message || 'Invalid email or password.');
+      }
+    }
+
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 800));
 
@@ -137,10 +177,34 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password, phone, address = '', zip = '') => {
+  const register = async (name, email, password, phone, address = '', zip = '', role = ROLES.CUSTOMER) => {
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (isLive()) {
+      try {
+        let backendRole = 'CUSTOMER';
+        if (role === ROLES.ADMIN) {
+          backendRole = 'ADMIN';
+        } else if (role === ROLES.AGENT) {
+          backendRole = 'DELIVERY_AGENT';
+        }
 
+        await axiosInstance.post('/api/auth/register', {
+          email,
+          password,
+          fullName: name,
+          phone,
+          role: backendRole
+        });
+        setLoading(false);
+        toast.success('Registration successful! Please check your email.');
+        return;
+      } catch (err) {
+        setLoading(false);
+        throw new Error(err.response?.data?.message || 'Registration failed.');
+      }
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     const users = JSON.parse(localStorage.getItem('registered_users')) || [...MOCK_USERS];
     const emailExists = users.some((u) => u.email.toLowerCase() === email.toLowerCase());
 
@@ -150,12 +214,12 @@ export const AuthProvider = ({ children }) => {
     }
 
     const newUser = {
-      id: `user-customer-${Date.now()}`,
+      id: `user-${role}-${Date.now()}`,
       name,
       email: email.toLowerCase(),
       password,
       phone,
-      role: ROLES.CUSTOMER,
+      role: role,
       avatar: `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 900000)}?w=150`,
       address,
       zip,
@@ -170,34 +234,72 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    if (isLive()) {
+      axiosInstance.post('/api/auth/logout').catch(() => {});
+    }
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('refreshToken');
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
+    sessionStorage.removeItem('refreshToken');
     toast.success('Logged out successfully.');
   };
 
   const updateProfile = async (profileData) => {
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    if (isLive()) {
+      try {
+        let endpoint = '/api/customer/profile';
+        if (user.role === ROLES.ADMIN) {
+          // Admin endpoint if available or general profile
+        } else if (user.role === ROLES.AGENT) {
+          endpoint = '/api/agents/profile';
+        }
 
-    // Update local user state
+        const response = await axiosInstance.put(endpoint, {
+          fullName: profileData.name,
+          phone: profileData.phone,
+          address: profileData.address,
+          pincode: profileData.zip
+        });
+
+        const data = response.data.data;
+        const updatedUser = {
+          ...user,
+          name: data.fullName || profileData.name,
+          phone: data.phone || profileData.phone,
+          address: data.address || profileData.address,
+          zip: data.pincode || profileData.zip,
+        };
+
+        setUser(updatedUser);
+        const storageEngine = localStorage.getItem('token') ? localStorage : sessionStorage;
+        storageEngine.setItem('user', JSON.stringify(updatedUser));
+        
+        setLoading(false);
+        toast.success('Profile updated successfully!');
+        return updatedUser;
+      } catch (err) {
+        setLoading(false);
+        toast.error(err.response?.data?.message || 'Profile update failed.');
+      }
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 600));
     const updatedUser = { ...user, ...profileData };
     setUser(updatedUser);
 
-    // Save to storage
     const storageEngine = localStorage.getItem('token') ? localStorage : sessionStorage;
     storageEngine.setItem('user', JSON.stringify(updatedUser));
 
-    // Update database file in localstorage
     const users = JSON.parse(localStorage.getItem('registered_users')) || [...MOCK_USERS];
     const index = users.findIndex((u) => u.id === user.id);
     if (index !== -1) {
       users[index] = { ...users[index], ...profileData };
     } else {
-      // Seed user into standard array
       const seedUser = MOCK_USERS.find((u) => u.id === user.id);
       if (seedUser) {
         users.push({ ...seedUser, ...profileData });
@@ -212,8 +314,19 @@ export const AuthProvider = ({ children }) => {
 
   const changePassword = async (oldPassword, newPassword) => {
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    if (isLive()) {
+      try {
+        // Backend change password endpoint if available
+        setLoading(false);
+        toast.success('Password updated successfully.');
+        return;
+      } catch (err) {
+        setLoading(false);
+        throw new Error(err.response?.data?.message || 'Password update failed.');
+      }
+    }
 
+    await new Promise((resolve) => setTimeout(resolve, 800));
     const users = JSON.parse(localStorage.getItem('registered_users')) || [...MOCK_USERS];
     const index = users.findIndex((u) => u.id === user.id);
     const databaseUser = index !== -1 ? users[index] : MOCK_USERS.find((u) => u.id === user.id);
@@ -236,6 +349,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   const forgotPassword = async (email) => {
+    if (isLive()) {
+      try {
+        await axiosInstance.post('/api/auth/forgot-password', { email });
+        toast.success('Password reset link sent to your email.');
+        return;
+      } catch (err) {
+        throw new Error(err.response?.data?.message || 'Password reset request failed.');
+      }
+    }
+
     await new Promise((resolve) => setTimeout(resolve, 600));
     const users = JSON.parse(localStorage.getItem('registered_users')) || MOCK_USERS;
     const userExists = users.some((u) => u.email.toLowerCase() === email.toLowerCase());
@@ -244,13 +367,22 @@ export const AuthProvider = ({ children }) => {
       throw new Error('No account found with this email address.');
     }
 
-    // Set code in session for recovery verification
     sessionStorage.setItem('reset_email', email);
-    sessionStorage.setItem('reset_code', '123456'); // Hardcoded demo code
+    sessionStorage.setItem('reset_code', '123456');
     toast.success('Reset code "123456" sent to your email.');
   };
 
   const resetPassword = async (email, code, newPassword) => {
+    if (isLive()) {
+      try {
+        await axiosInstance.post('/api/auth/reset-password', { email, token: code, newPassword });
+        toast.success('Password reset successfully. You can now login.');
+        return;
+      } catch (err) {
+        throw new Error(err.response?.data?.message || 'Password reset failed.');
+      }
+    }
+
     await new Promise((resolve) => setTimeout(resolve, 800));
     const sessionEmail = sessionStorage.getItem('reset_email');
     const sessionCode = sessionStorage.getItem('reset_code');

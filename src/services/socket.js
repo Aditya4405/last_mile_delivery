@@ -1,132 +1,144 @@
-import { io } from 'socket.io-client';
+import SockJS from 'sockjs-client';
+import Stomp from 'stompjs';
 
-// Coordinates of major locations in Indian cities for mock routing
-// Noida (Central) to Delhi (South)
-const MOCK_ROUTES = {
-  'ORD-9821': [
-    { lat: 28.5355, lng: 77.3910, speed: 45, eta: '25 mins' }, // Noida Sec 62
-    { lat: 28.5450, lng: 77.3780, speed: 40, eta: '22 mins' },
-    { lat: 28.5620, lng: 77.3450, speed: 50, eta: '18 mins' }, // Noida Entry Toll
-    { lat: 28.5810, lng: 77.3100, speed: 30, eta: '14 mins' },
-    { lat: 28.5900, lng: 77.2800, speed: 20, eta: '10 mins' }, // DND Flyway
-    { lat: 28.5700, lng: 77.2500, speed: 42, eta: '7 mins' },
-    { lat: 28.5672, lng: 77.2190, speed: 15, eta: '2 mins' },  // Green Park Delhi
-  ],
-  'ORD-9710': [
-    { lat: 28.4595, lng: 77.0266, speed: 35, eta: '35 mins' }, // Gurgaon Sec 29
-    { lat: 28.4720, lng: 77.0420, speed: 55, eta: '30 mins' }, // Cyber City
-    { lat: 28.5010, lng: 77.0780, speed: 60, eta: '24 mins' }, // NH48 Highway
-    { lat: 28.5240, lng: 77.1020, speed: 40, eta: '18 mins' },
-    { lat: 28.5420, lng: 77.1350, speed: 45, eta: '12 mins' }, // Vasant Kunj
-    { lat: 28.5562, lng: 77.1700, speed: 25, eta: '5 mins' },
-    { lat: 28.5685, lng: 77.2090, speed: 0, eta: 'Delivered' }, // AIIMS Area
-  ],
+const getWsUrl = () => {
+  return import.meta.env.VITE_WS_URL || 'http://localhost:8084/ws';
 };
 
 class SocketService {
   constructor() {
+    this.stompClient = null;
     this.socket = null;
+    this.connected = false;
     this.listeners = new Map();
-    this.simulators = new Map();
+    this.subscriptions = new Map();
+    this.reconnectTimeout = null;
   }
 
-  connect(url = 'http://localhost:5000') {
+  connect() {
+    if (this.stompClient && this.connected) {
+      return;
+    }
+    
     try {
-      this.socket = io(url, {
-        autoConnect: false,
-        reconnectionAttempts: 5,
-        timeout: 10000,
-      });
+      const wsUrl = getWsUrl();
+      this.socket = new SockJS(wsUrl);
+      this.stompClient = Stomp.over(this.socket);
+      
+      // Disable STOMP debug console logs unless needed
+      this.stompClient.debug = null;
 
-      this.socket.on('connect', () => {
-        console.log('Connected to LogiTrack Socket Server');
-      });
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-      this.socket.on('disconnect', () => {
-        console.log('Disconnected from LogiTrack Socket Server');
-      });
+      this.stompClient.connect(
+        headers,
+        (frame) => {
+          this.connected = true;
+          console.log('Connected to LogiTrack STOMP WebSocket broker');
+          
+          // Re-subscribe all active listeners upon reconnection
+          this.listeners.forEach((callback, destination) => {
+            this._subscribeToDestination(destination, callback);
+          });
+        },
+        (error) => {
+          console.warn('STOMP connection error or disconnect:', error);
+          this.connected = false;
+          this.scheduleReconnect();
+        }
+      );
+    } catch (err) {
+      console.error('Failed to initialize SockJS/STOMP connection:', err);
+      this.scheduleReconnect();
+    }
+  }
 
-      this.socket.on('tracking_update', (data) => {
-        const { orderId } = data;
-        if (this.listeners.has(orderId)) {
-          this.listeners.get(orderId)(data);
+  scheduleReconnect() {
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+    }
+    this.reconnectTimeout = setTimeout(() => {
+      console.log('Attempting STOMP reconnect...');
+      this.connect();
+    }, 5000);
+  }
+
+  subscribe(destination, callback) {
+    const topic = destination.startsWith('/') ? destination : `/topic/tracking/${destination}`;
+    this.listeners.set(topic, callback);
+
+    if (this.connected && this.stompClient) {
+      this._subscribeToDestination(topic, callback);
+    }
+  }
+
+  _subscribeToDestination(destination, callback) {
+    // Unsubscribe existing if any to avoid duplication
+    this.unsubscribe(destination);
+
+    try {
+      const sub = this.stompClient.subscribe(destination, (message) => {
+        try {
+          const data = JSON.parse(message.body);
+          
+          // Map backend location fields to format expected by telemetry hooks
+          const mappedData = {
+            orderId: data.orderId,
+            status: data.status,
+            latitude: data.latitude,
+            longitude: data.longitude,
+            speed: data.speed,
+            eta: data.eta || 'Awaiting updates...',
+            timestamp: new Date().toISOString()
+          };
+          callback(mappedData);
+        } catch (e) {
+          console.error('Failed to parse STOMP message body:', e);
         }
       });
-
-      this.socket.connect();
+      this.subscriptions.set(destination, sub);
     } catch (err) {
-      console.warn('Socket connection failed, using local simulator:', err.message);
+      console.error(`Failed to subscribe to STOMP destination: ${destination}`, err);
     }
   }
 
-  subscribe(orderId, callback) {
-    this.listeners.set(orderId, callback);
+  unsubscribe(destination) {
+    const topic = destination.startsWith('/') ? destination : `/topic/tracking/${destination}`;
+    this.listeners.delete(topic);
 
-    if (this.socket && this.socket.connected) {
-      this.socket.emit('subscribe_tracking', { orderId });
-    } else {
-      // Fallback local simulator
-      this.startSimulator(orderId, callback);
-    }
-  }
-
-  unsubscribe(orderId) {
-    this.listeners.delete(orderId);
-
-    if (this.socket && this.socket.connected) {
-      this.socket.emit('unsubscribe_tracking', { orderId });
-    } else {
-      this.stopSimulator(orderId);
-    }
-  }
-
-  startSimulator(orderId, callback) {
-    this.stopSimulator(orderId);
-
-    const route = MOCK_ROUTES[orderId] || [
-      { lat: 28.5355, lng: 77.3910, speed: 40, eta: '15 mins' },
-      { lat: 28.5400, lng: 77.3700, speed: 38, eta: '12 mins' },
-      { lat: 28.5480, lng: 77.3500, speed: 45, eta: '8 mins' },
-      { lat: 28.5550, lng: 77.3200, speed: 30, eta: '4 mins' },
-      { lat: 28.5672, lng: 77.2190, speed: 0, eta: 'Arrived' },
-    ];
-
-    let index = 0;
-    
-    const intervalId = setInterval(() => {
-      const data = route[index];
-      callback({
-        orderId,
-        latitude: data.lat,
-        longitude: data.lng,
-        speed: data.speed,
-        eta: data.eta,
-        status: index === route.length - 1 ? 'delivered' : 'in_transit',
-        timestamp: new Date().toISOString(),
-      });
-
-      index = (index + 1) % route.length; // Loop back for demonstration purposes
-    }, 4000);
-
-    this.simulators.set(orderId, intervalId);
-  }
-
-  stopSimulator(orderId) {
-    if (this.simulators.has(orderId)) {
-      clearInterval(this.simulators.get(orderId));
-      this.simulators.delete(orderId);
+    if (this.subscriptions.has(topic)) {
+      try {
+        this.subscriptions.get(topic).unsubscribe();
+      } catch (err) {
+        console.warn(`Error unsubscribing from STOMP destination: ${topic}`, err);
+      }
+      this.subscriptions.delete(topic);
     }
   }
 
   disconnect() {
-    if (this.socket) {
-      this.socket.disconnect();
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
     }
-    // Clean all simulators
-    for (const intervalId of this.simulators.values()) {
-      clearInterval(intervalId);
+    
+    if (this.stompClient) {
+      try {
+        this.stompClient.disconnect(() => {
+          console.log('STOMP client disconnected');
+        });
+      } catch (e) {
+        console.warn('Error during STOMP client disconnect:', e);
+      }
     }
-    this.simulators.clear();
+    
+    this.connected = false;
+    this.subscriptions.clear();
+    this.listeners.clear();
   }
 }
 

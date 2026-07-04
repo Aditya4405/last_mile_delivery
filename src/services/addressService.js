@@ -14,8 +14,7 @@ export const addressService = {
           addressdetails: 1,
         },
         headers: {
-          'Accept-Language': 'en',
-          'User-Agent': 'LogiTrack-Logistics-App' // Nominatim requests a User-Agent
+          'Accept-Language': 'en'
         }
       });
       

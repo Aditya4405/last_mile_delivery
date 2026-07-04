@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
+import { trackingService } from '../../services/trackingService';
 import { socketService } from '../../services/socket';
 import { formatDate } from '../../utils';
 import MapPlaceholder from '../../components/MapPlaceholder';
@@ -27,12 +28,13 @@ const LiveTracking = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
+  const [timelineEvents, setTimelineEvents] = useState([]);
   const [telemetry, setTelemetry] = useState({
     latitude: null,
     longitude: null,
     speed: 0,
     eta: 'Awaiting updates...',
-    status: 'assigned',
+    status: 'ORDER_CREATED',
   });
 
   const fetchOrderTracking = async () => {
@@ -45,6 +47,12 @@ const LiveTracking = () => {
         status: data.status,
         eta: formatDate(data.estimatedDelivery, 'hh:mm A'),
       }));
+
+      // Fetch tracking history timeline from the backend
+      const trackingData = await trackingService.trackOrder(data.trackingNumber);
+      if (trackingData && trackingData.timeline) {
+        setTimelineEvents(trackingData.timeline);
+      }
     } catch (err) {
       toast.error('Manifest registry tracking details not found.');
     } finally {
@@ -77,6 +85,9 @@ const LiveTracking = () => {
         }
         return prev;
       });
+
+      // Re-fetch timeline events to show dynamic progress updates
+      fetchOrderTracking();
     });
 
     return () => {
@@ -105,35 +116,40 @@ const LiveTracking = () => {
     );
   }
 
-  // List of standard delivery status stages
+  // List of standard delivery status stages matching OrderStatus backend enum
   const TRACKING_STEPS = [
-    { key: 'pending', label: 'Order Confirmed', description: 'Order registered by customer', icon: FiCheckCircle },
-    { key: 'assigned', label: 'Agent Assigned', description: 'Delivery executive appointed', icon: FiUserCheck },
-    { key: 'picked_up', label: 'Picked Up', description: 'Package collected from pickup address', icon: FiPackage },
-    { key: 'reached_hub', label: 'Reached Hub', description: 'Consignment entered local logistics hub', icon: FiMap },
-    { key: 'in_transit', label: 'In Transit', description: 'Package en route to city zone', icon: FiTruck },
-    { key: 'out_for_delivery', label: 'Out For Delivery', description: 'Courier rider is in your area', icon: FiNavigation },
-    { key: 'delivered', label: 'Delivered', description: 'Successfully handed over with OTP verification', icon: FiCheckCircle },
+    { key: 'CONFIRMED', label: 'Order Confirmed', description: 'Order registered and confirmed', icon: FiCheckCircle },
+    { key: 'ASSIGNED', label: 'Agent Assigned', description: 'Delivery executive appointed', icon: FiUserCheck },
+    { key: 'PICKED_UP', label: 'Picked Up', description: 'Package collected from pickup address', icon: FiPackage },
+    { key: 'REACHED_HUB', label: 'Reached Hub', description: 'Consignment entered local logistics hub', icon: FiMap },
+    { key: 'IN_TRANSIT', label: 'In Transit', description: 'Package en route to city zone', icon: FiTruck },
+    { key: 'OUT_FOR_DELIVERY', label: 'Out For Delivery', description: 'Courier rider is in your area', icon: FiNavigation },
+    { key: 'DELIVERED', label: 'Delivered', description: 'Successfully handed over to recipient', icon: FiCheckCircle },
   ];
+
+  // Helper to retrieve the matching tracking history event from the backend
+  const getMatchingEvent = (stepKey) => {
+    if (!timelineEvents) return null;
+    if (stepKey === 'CONFIRMED') {
+      // Confirmed step can match either ORDER_CREATED or CONFIRMED status
+      return timelineEvents.find(e => e.status === 'CONFIRMED' || e.status === 'ORDER_CREATED');
+    }
+    return timelineEvents.find(e => e.status === stepKey);
+  };
 
   // Helper to determine status indexing
   const getStepStatus = (stepKey) => {
-    const statusOrdering = [
-      'pending',
-      'assigned',
-      'picked_up',
-      'reached_hub',
-      'in_transit',
-      'out_for_delivery',
-      'delivered',
-    ];
-
-    const currentIdx = statusOrdering.indexOf(telemetry.status);
-    const stepIdx = statusOrdering.indexOf(stepKey);
-
-    if (stepIdx < currentIdx) return 'completed';
-    if (stepIdx === currentIdx) return 'active';
-    return 'pending';
+    const matchingEvent = getMatchingEvent(stepKey);
+    if (!matchingEvent) {
+      return 'pending';
+    }
+    
+    // Find the latest completed event in the timeline
+    const latestEvent = timelineEvents[timelineEvents.length - 1];
+    if (latestEvent && (latestEvent.status === stepKey || (stepKey === 'CONFIRMED' && latestEvent.status === 'ORDER_CREATED'))) {
+      return 'active';
+    }
+    return 'completed';
   };
 
   // Mock driver stats
@@ -194,7 +210,7 @@ const LiveTracking = () => {
               <div>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Distance Left</p>
                 <h4 className="text-sm font-extrabold text-slate-800 mt-0.5">
-                  {telemetry.status === 'delivered' ? '0 km' : '4.8 km'}
+                  {telemetry.status === 'DELIVERED' ? '0 km' : '4.8 km'}
                 </h4>
               </div>
             </div>
@@ -206,7 +222,7 @@ const LiveTracking = () => {
               <div>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Current Speed</p>
                 <h4 className="text-sm font-extrabold text-slate-800 mt-0.5">
-                  {telemetry.status === 'delivered' ? '0 km/h' : `${telemetry.speed || 38} km/h`}
+                  {telemetry.status === 'DELIVERED' ? '0 km/h' : `${telemetry.speed || 38} km/h`}
                 </h4>
               </div>
             </div>
@@ -291,6 +307,7 @@ const LiveTracking = () => {
               <ul className="-mb-8">
                 {TRACKING_STEPS.map((step, idx) => {
                   const stepStatus = getStepStatus(step.key);
+                  const matchingEvent = getMatchingEvent(step.key);
                   const isLast = idx === TRACKING_STEPS.length - 1;
 
                   return (
@@ -298,30 +315,30 @@ const LiveTracking = () => {
                       <div className="relative pb-8">
                         {!isLast && (
                           <span
-                            className={`absolute top-4 left-4.5 -ml-px h-full w-0.5 ${ stepStatus === 'completed' ? 'bg-blue-600' : 'bg-slate-200 ' }`}
+                            className={`absolute top-4 left-4.5 -ml-px h-full w-0.5 ${ stepStatus === 'completed' || stepStatus === 'active' ? 'bg-blue-600' : 'bg-slate-200' }`}
                             aria-hidden="true"
                           />
                         )}
                         <div className="relative flex space-x-3.5 items-start">
                           <div>
                             <span
-                              className={`h-9 w-9 rounded-full flex items-center justify-center border-2 transition-all ${ stepStatus === 'completed' ? 'bg-blue-600 border-blue-600 text-white' : stepStatus === 'active' ? 'bg-orange-50 border-orange-500 text-orange-600 ' : 'bg-white border-slate-200 text-slate-400 ' }`}
+                              className={`h-9 w-9 rounded-full flex items-center justify-center border-2 transition-all ${ stepStatus === 'completed' || stepStatus === 'active' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-200 text-slate-400' }`}
                             >
                               <step.icon className="h-4.5 w-4.5" />
                             </span>
                           </div>
                           <div className="min-w-0 flex-1 pt-1.5">
                             <p
-                              className={`text-xs font-bold ${ stepStatus === 'active' ? 'text-orange-600 font-black' : 'text-slate-800 ' }`}
+                              className={`text-xs font-bold ${ stepStatus === 'active' ? 'text-blue-600 font-black' : 'text-slate-800' }`}
                             >
                               {step.label}
                             </p>
                             <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
-                              {step.description}
+                              {matchingEvent ? matchingEvent.remarks : step.description}
                             </p>
-                            {stepStatus === 'completed' && idx === 0 && (
+                            {matchingEvent && (
                               <span className="text-[9px] text-slate-400 block mt-0.5">
-                                {formatDate(order.createdAt, 'DD MMM, hh:mm A')}
+                                {formatDate(matchingEvent.updatedAt, 'DD MMM, hh:mm A')}
                               </span>
                             )}
                           </div>
